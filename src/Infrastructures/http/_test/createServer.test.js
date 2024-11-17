@@ -37,4 +37,20 @@ describe('HTTP server', () => {
     expect(responseJson.status).toEqual('error');
     expect(responseJson.message).toEqual('terjadi kegagalan pada server kami');
   });
+
+  it('should response 401 when trying access content without proper authorization', async () => {
+    const server = await createServer({});
+
+    // Action
+    const response = await server.inject({
+      method: 'POST', 
+      url: '/threads',
+      payload: {},
+    });
+
+    // Assert
+    const responseJson = JSON.parse(response.payload);
+    expect(response.statusCode).toEqual(401);
+    expect(responseJson.message).toBeDefined();
+  })
 });

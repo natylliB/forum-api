@@ -24,6 +24,10 @@ const AuthenticationsTableTestHelper = {
   async cleanTable() {
     await pool.query('DELETE FROM authentications WHERE 1=1');
   },
+  async getAll() {
+    const result = await pool.query('SELECT * FROM authentications');
+    return result.rows;
+  }
 };
 
 module.exports = AuthenticationsTableTestHelper;
