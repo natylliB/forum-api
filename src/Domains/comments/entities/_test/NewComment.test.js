@@ -22,5 +22,19 @@ describe('NewComment{ thread_id, content, owner } object', () => {
     // Action & Assert
     expect(() => new NewComment(payload)).toThrowError('NEW_COMMENT.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
   });
-  it.todo('should create NewComment object correctly');
+  it('should create NewComment object correctly', () => {
+    const payload = {
+      thread_id: 'tread-123',
+      content: 'Some Comment',
+      owner: 'user-123',
+    };
+
+    // Action
+    const { thread_id, content, owner } = new NewComment(payload);
+
+    // Assert
+    expect(thread_id).toEqual(payload.thread_id);
+    expect(content).toEqual(payload.content);
+    expect(owner).toEqual(payload.owner);
+  });
 });
