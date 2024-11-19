@@ -18,6 +18,18 @@ const CommentTableTestHelper = {
   async getAll() {
     const result = await pool.query('SELECT * FROM comments');
     return result.rows;
+  },
+  async addComment({ 
+    id = 'comment-123', 
+    thread_id = 'thread-123', 
+    content = 'Some Comment', 
+    owner = 'user-123' }) {
+      const query = {
+        text: 'INSERT INTO comments VALUES($1, $2, $3, $4)',
+        values: [id, thread_id, content, owner],
+      };
+
+      await pool.query(query);
   }
 }
 

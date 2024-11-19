@@ -1,5 +1,6 @@
 const AddedComment = require('../../Domains/comments/entities/AddedComment');
 const CommentRepository = require('../../Domains/comments/CommentRepository');
+const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 
 class CommentRepositoryPostgres extends CommentRepository {
   constructor(pool, idGenerator) {
@@ -21,6 +22,42 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     const result = await this._pool.query(query);
     return new AddedComment({ ...result.rows[0] });
+  }
+
+  async isCommentAvailableInThread(commentId, threadId) {
+    const query = {
+      text: 'SELECT EXISTS(SELECT 1 FROM comments WHERE id = $1 AND thread_id = $2)',
+      values: [commentId, threadId],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows[0].exists;
+  }
+
+  async checkCommentOwnership(commentId, userId) {
+    const query = {
+      text: 'SELECT owner FROM comments WHERE id = $1',
+      values: [commentId],
+    };
+
+    const owner = (await this._pool.query(query)).rows[0].owner;
+
+    if (owner !== userId) {
+      throw new AuthorizationError('Anda tidak berhak melakukan perubahan pada komentar ini');
+    }
+  }
+
+  async deleteComment(commentId) {
+    const query = {
+      text: `
+        UPDATE comments
+        SET is_delete = $1
+        WHERE id = $2
+      `,
+      values: [true, commentId],
+    };
+
+    await this._pool.query(query);
   }
 }
 
