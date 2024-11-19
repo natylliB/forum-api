@@ -19,6 +19,14 @@ const ThreadsTableTestHelper = {
   async getAll() {
     const result = await pool.query('SELECT * FROM threads');
     return result.rows;
+  },
+  async addThread({ id = 'thread-123', title = 'Some Interesting Topic' , body = 'Some Engaging Content' , owner = 'user-123' }) {
+    const query = {
+      text: 'INSERT INTO threads VALUES($1, $2, $3, $4)',
+      values: [id, title, body, owner],
+    };
+
+    await pool.query(query);
   }
 }
 
