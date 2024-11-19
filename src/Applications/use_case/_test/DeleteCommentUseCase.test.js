@@ -51,7 +51,9 @@ describe('Delete Comment Use Case', () => {
     mockThreadRepository.isThreadAvailable =  jest.fn().mockResolvedValue(true);
     mockCommentRepository.isCommentAvailableInThread = jest.fn().mockResolvedValue(true);
     mockCommentRepository.checkCommentOwnership = jest.fn()
-      .mockRejectedValue(new AuthorizationError('Anda tidak berhak menghapus komentar ini'));
+      .mockRejectedValue(
+        new AuthorizationError('Anda tidak berhak melakukan perubahan pada komentar ini')
+      );
     
     const deleteCommentUseCase = new DeleteCommentUseCase({
       threadRepository: mockThreadRepository,
@@ -60,8 +62,11 @@ describe('Delete Comment Use Case', () => {
 
     // Action & Assert
     /** deleteCommentUseCase.execute(threadId, commentId, userId) */
-    await expect(deleteCommentUseCase.execute('threadId', 'commentId', undefined))
-      .rejects.toThrowError(new AuthorizationError('Anda tidak berhak menghapus komentar ini'));
+    await expect(
+      deleteCommentUseCase.execute('threadId', 'commentId', undefined)
+    ).rejects.toThrowError(
+      new AuthorizationError('Anda tidak berhak melakukan perubahan pada komentar ini')
+    );
   });
   it('should orchestrate the delete comment process correctly', async () => {
     // Arrange
