@@ -7,7 +7,7 @@ const AddedThread = require('../../../Domains/threads/entities/AddedThread');
 
 describe('ThreadRepositoryPostgres', () => {
   beforeAll(async () => {
-    await UsersTableTestHelper.addUser({ username: 'billy' });
+    await UsersTableTestHelper.addUser({ id: 'user-123', username: 'billy' });
   })
 
   afterAll(async() => {
@@ -45,4 +45,27 @@ describe('ThreadRepositoryPostgres', () => {
       }));
     });
   });
+
+  describe('isThreadAvailable function', () => {
+    it('should resolve false if thread is not available', async () => {
+      // Arrange
+      await ThreadsTableTestHelper.addThread({ id: 'thread-123', owner: 'user-123' });
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      // Action
+      const isThreadAvailable = await threadRepositoryPostgres.isThreadAvailable('thread-456');
+
+      expect(isThreadAvailable).toEqual(false);
+    });
+    it('should resolve true if thread is available', async () => {
+      // Arrange
+      await ThreadsTableTestHelper.addThread({ id: 'thread-123', owner: 'user-123' });
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      // Action
+      const isThreadAvailable = await threadRepositoryPostgres.isThreadAvailable('thread-123');
+
+      expect(isThreadAvailable).toEqual(true);
+    });
+  })
 })
