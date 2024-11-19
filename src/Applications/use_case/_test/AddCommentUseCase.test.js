@@ -4,6 +4,7 @@ const CommentRepository = require('../../../Domains/comments/CommentRepository')
 const AddedComment = require('../../../Domains/comments/entities/AddedComment');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
+const InvariantError = require('../../../Commons/exceptions/InvariantError');
 
 jest.mock('../../../Domains/comments/entities/NewComment');
 
@@ -33,6 +34,29 @@ describe('AddCommentUseCase', () => {
 
     await expect(addCommentUseCase.execute(useCasePayload)).rejects.toThrowError(NotFoundError)
   });
+
+  it('should throw Invariant Error when there is no comment', async () => {
+    // Arrange
+    const useCasePayload = {
+      thread_id: 'thread-123',
+      owner: 'user-123',
+    };
+
+    const addCommentUseCase = new AddCommentUseCase({}, {});
+    await expect(addCommentUseCase.execute(useCasePayload)).rejects.toThrowError(InvariantError);
+  });
+
+  it('should throw Invariant Error when comment not met data type specification', async () => {
+    // Arrange
+    const useCasePayload = {
+      thread_id: 'thread-123',
+      content: [''],
+      owner: 'user-123',
+    };
+
+    const addCommentUseCase = new AddCommentUseCase({}, {});
+    await expect(addCommentUseCase.execute(useCasePayload)).rejects.toThrowError(InvariantError);
+  })
 
   it('should orchestrate add comment to threat correctly', async () => {
     // Arrange
