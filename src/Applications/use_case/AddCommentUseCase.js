@@ -8,6 +8,7 @@ class AddCommentUseCase {
     this._threadRepository = threadRepository;
 
     this.execute = this.execute.bind(this);
+    this._validateComment = this._validateComment.bind(this);
   }
 
   async execute(payload) {
