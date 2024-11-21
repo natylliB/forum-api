@@ -15,6 +15,7 @@ describe('AddCommentUseCase', () => {
       thread_id: 'thread-unavailable',
       content: 'Some Comment',
       owner: 'user-123',
+      date: new Date().toISOString(),
     };
 
     // mock NewComment constructor property
@@ -22,6 +23,7 @@ describe('AddCommentUseCase', () => {
       thread_id: payload.thread_id,
       content: payload.content,
       owner: payload.owner,
+      date: payload.date,
     }));
 
     /** mock required depedencies */
@@ -40,6 +42,7 @@ describe('AddCommentUseCase', () => {
     const useCasePayload = {
       thread_id: 'thread-123',
       owner: 'user-123',
+      date: new Date().toISOString(),
     };
 
     const addCommentUseCase = new AddCommentUseCase({}, {});
@@ -52,6 +55,7 @@ describe('AddCommentUseCase', () => {
       thread_id: 'thread-123',
       content: [''],
       owner: 'user-123',
+      date: new Date().toISOString(),
     };
 
     const addCommentUseCase = new AddCommentUseCase({}, {});
@@ -64,6 +68,7 @@ describe('AddCommentUseCase', () => {
       thread_id: 'thread-123',
       content: 'Some Comment',
       owner: 'user-123',
+      date: new Date().toISOString(),
     };
 
     // mock NewComment constructor property 
@@ -71,6 +76,7 @@ describe('AddCommentUseCase', () => {
       thread_id: payload.thread_id,
       content: payload.content,
       owner: payload.owner,
+      date: payload.date,
     }));
 
     /** Mock required depedencies */

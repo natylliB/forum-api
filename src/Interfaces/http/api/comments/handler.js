@@ -13,10 +13,11 @@ class CommentsHandler {
     const { content } = request.payload;
     const owner = request.auth.credentials.id;
     const thread_id = request.params.threadId;
+    const date = new Date().toISOString();
     
     const addCommentUseCase = this._container.getInstance(AddCommentUseCase.name);
 
-    const addedComment = await addCommentUseCase.execute({ thread_id, content, owner });
+    const addedComment = await addCommentUseCase.execute({ thread_id, content, owner, date });
 
     const response = h.response({
       status: 'success',

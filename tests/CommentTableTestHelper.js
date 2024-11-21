@@ -23,13 +23,24 @@ const CommentTableTestHelper = {
     id = 'comment-123', 
     thread_id = 'thread-123', 
     content = 'Some Comment', 
-    owner = 'user-123' }) {
+    owner = 'user-123',
+    is_delete = false,
+    date = new Date().toISOString(),
+   }) {
       const query = {
-        text: 'INSERT INTO comments VALUES($1, $2, $3, $4)',
-        values: [id, thread_id, content, owner],
+        text: 'INSERT INTO comments VALUES($1, $2, $3, $4, $5, $6)',
+        values: [id, thread_id, content, owner, is_delete, date],
       };
 
       await pool.query(query);
+  },
+  async deleteComment(commentId) {
+    const query = {
+      text: 'UPDATE comments SET is_delete = $1 WHERE id = $2',
+      values: [true, commentId],
+    };
+
+    await pool.query(query);
   }
 }
 

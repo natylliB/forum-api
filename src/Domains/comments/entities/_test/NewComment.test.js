@@ -1,6 +1,6 @@
 const NewComment = require('../NewComment');
 
-describe('NewComment{ thread_id, content, owner } object', () => {
+describe('NewComment{ thread_id, content, owner, date } object', () => {
   it('should throw error when missing required property', () => {
     // Arrange
     const payload ={
@@ -17,6 +17,7 @@ describe('NewComment{ thread_id, content, owner } object', () => {
       thread_id: 'thread-123',
       content: 'Some Comment',
       owner: 123,
+      date: new Date().toISOString(),
     };
 
     // Action & Assert
@@ -27,14 +28,16 @@ describe('NewComment{ thread_id, content, owner } object', () => {
       thread_id: 'tread-123',
       content: 'Some Comment',
       owner: 'user-123',
+      date: new Date().toISOString(),
     };
 
     // Action
-    const { thread_id, content, owner } = new NewComment(payload);
+    const { thread_id, content, owner, date } = new NewComment(payload);
 
     // Assert
     expect(thread_id).toEqual(payload.thread_id);
     expect(content).toEqual(payload.content);
     expect(owner).toEqual(payload.owner);
+    expect(date).toEqual(payload.date);
   });
 });

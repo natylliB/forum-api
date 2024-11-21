@@ -33,6 +33,7 @@ describe('CommentRepositoryPostgres', () => {
         thread_id: 'thread-123',
         content: 'Some Top Rated Comment',
         owner: 'user-123',
+        date: new Date().toISOString(),
       });
       const fakeIdGenerator = () => 123;
 
@@ -59,6 +60,7 @@ describe('CommentRepositoryPostgres', () => {
         thread_id: 'thread-123',
         content: 'Some Comment',
         owner: 'user-123',
+        date: new Date().toISOString(),
       });
       const fakeIdGenerator = () => 123;
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
@@ -78,6 +80,7 @@ describe('CommentRepositoryPostgres', () => {
         thread_id: 'thread-123',
         content: 'Some Comment',
         owner: 'user-123',
+        date: new Date().toISOString(),
       });
       const fakeIdGenerator = () => 123;
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
@@ -99,7 +102,8 @@ describe('CommentRepositoryPostgres', () => {
       CommentTableTestHelper.addComment({ 
         id: 'comment-123', 
         thread_id: 'thread-123', 
-        owner: 'user-123' 
+        owner: 'user-123',
+        date: new Date().toISOString(),
       });
 
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
@@ -118,6 +122,7 @@ describe('CommentRepositoryPostgres', () => {
         id: 'comment-123',
         thread_id: 'thread-123',
         owner: 'user-123',
+        date: new Date().toISOString(),
       });
 
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
