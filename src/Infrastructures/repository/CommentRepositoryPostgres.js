@@ -10,6 +10,9 @@ class CommentRepositoryPostgres extends CommentRepository {
     this._idGenerator = idGenerator;
 
     this.addComment = this.addComment.bind(this);
+    this.isCommentAvailableInThread = this.isCommentAvailableInThread.bind(this);
+    this.checkCommentOwnership = this.checkCommentOwnership.bind(this);
+    this.deleteComment = this.deleteComment.bind(this);
   }
 
   async addComment(newComment) {

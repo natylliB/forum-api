@@ -12,6 +12,7 @@ describe('AddThreadUseCase', () => {
       title: 'Some Topic',
       body: 'Some Content',
       owner: 'user-123',
+      date: new Date().toISOString(),
     };
     
     // mock thread constructor behavior
@@ -19,6 +20,7 @@ describe('AddThreadUseCase', () => {
       title: payload.title,
       body: payload.body,
       owner: payload.owner,
+      date: payload.date,
     }));
 
     /** Mock required depedencies */

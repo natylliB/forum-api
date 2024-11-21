@@ -1,4 +1,3 @@
-const { headers } = require("@hapi/hapi/lib/cors");
 const AuthenticationsTableTestHelper = require("../../../../tests/AuthenticationsTableTestHelper");
 const CommentTableTestHelper = require("../../../../tests/CommentTableTestHelper");
 const ThreadsTableTestHelper = require("../../../../tests/ThreadsTableTestHelper");

@@ -15,6 +15,7 @@ describe('Threads { title, body, owner } object', () => {
       title: 'Some Topic',
       body: 'Some content',
       owner: 123,
+      date: new Date().toISOString(),
     };
 
     expect(() => new Thread(payload)).toThrowError('THREADS.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
@@ -25,12 +26,14 @@ describe('Threads { title, body, owner } object', () => {
       title: 'Some Topic', 
       body: 'Some Content',
       owner: 'user-123',
+      date: new Date().toISOString(),
     };
 
-    const { title, body, owner } = new Thread(payload);
+    const { title, body, owner, date } = new Thread(payload);
 
     expect(title).toEqual(payload.title);
     expect(body).toEqual(payload.body);
     expect(owner).toEqual(payload.owner);
+    expect(date).toEqual(payload.date);
   });
 });

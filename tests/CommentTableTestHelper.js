@@ -28,11 +28,12 @@ const CommentTableTestHelper = {
     date = new Date().toISOString(),
    }) {
       const query = {
-        text: 'INSERT INTO comments VALUES($1, $2, $3, $4, $5, $6)',
+        text: 'INSERT INTO comments VALUES($1, $2, $3, $4, $5, $6) returning date',
         values: [id, thread_id, content, owner, is_delete, date],
       };
 
-      await pool.query(query);
+      const result = await pool.query(query);
+      return result.rows[0].date.toISOString();
   },
   async deleteComment(commentId) {
     const query = {
@@ -41,7 +42,24 @@ const CommentTableTestHelper = {
     };
 
     await pool.query(query);
-  }
+  },
+  async getCommentTimestamp(id) {
+    const query = {
+      text: `
+        SELECT
+          TO_CHAR(date AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS date
+        FROM
+          comments
+        WHERE
+          id = $1
+      `,
+      values: [id],
+    };
+
+    const result = await pool.query(query);
+    console.log(result.rows[0]);
+    return result.rows[0].date;
+  },
 }
 
 module.exports = CommentTableTestHelper;

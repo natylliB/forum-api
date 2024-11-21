@@ -4,11 +4,12 @@ const container = require('../../container');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const AuthenticationsTableTestHelper = require('../../../../tests/AuthenticationsTableTestHelper');
+const CommentTableTestHelper = require('../../../../tests/CommentTableTestHelper');
 
 describe('/threads endpoint', () => {
   let server = null;
-  let accessToken = '';
-  let refreshToken = '';
+  let billyAccessToken = '';
+  let billyRefreshToken = '';
   
   beforeAll(async () => {
     // AddUser 
@@ -34,8 +35,8 @@ describe('/threads endpoint', () => {
     });
 
     const responseJson = JSON.parse(response.payload);
-    accessToken = responseJson.data.accessToken;
-    refreshToken = responseJson.data.refreshToken;
+    billyAccessToken = responseJson.data.accessToken;
+    billyRefreshToken = responseJson.data.refreshToken;
   });
   
   afterAll(async () => {
@@ -44,7 +45,7 @@ describe('/threads endpoint', () => {
       method: 'DELETE',
       url: '/authentications',
       payload: {
-        refreshToken,
+        refreshToken: billyRefreshToken,
       },
     });
 
@@ -60,8 +61,8 @@ describe('/threads endpoint', () => {
     expect(userRows).toHaveLength(0);
     expect(threadRows).toHaveLength(0);
 
-    accessToken = '';
-    refreshToken = '';
+    billyAccessToken = '';
+    billyRefreshToken = '';
 
     // close client
     await pool.end();
@@ -84,7 +85,7 @@ describe('/threads endpoint', () => {
         method: 'POST',
         url: '/threads',
         headers: {
-          authorization: `Bearer ${accessToken}`,
+          authorization: `Bearer ${billyAccessToken}`,
         },
         payload: invalidPayload,
       });
@@ -107,7 +108,7 @@ describe('/threads endpoint', () => {
         method: 'POST',
         url: '/threads',
         headers: {
-          authorization: `Bearer ${accessToken}`,
+          authorization: `Bearer ${billyAccessToken}`,
         },
         payload: incompletePayload,
       });
@@ -131,7 +132,7 @@ describe('/threads endpoint', () => {
         method: 'POST',
         url: '/threads',
         headers: {
-          authorization: `Bearer ${accessToken}`,
+          authorization: `Bearer ${billyAccessToken}`,
         },
         payload: requestPayload,
       });
@@ -146,5 +147,159 @@ describe('/threads endpoint', () => {
       expect(responseJson.data.addedThread).toHaveProperty('title');
       expect(responseJson.data.addedThread).toHaveProperty('owner');
     });
+  });
+
+  describe('when GET /threads/{threadId}', () => {
+    it('should response 404 when thread you access is invalid/not available', async () => {
+      // Action
+      const response = await server.inject({
+        method: 'GET',
+        url: '/threads/unknown_thread'
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('Thread tidak ditemukan');
+    });
+    it('should response 200 with expected thread detail', async () => {
+      // Arrange
+      /** create user jack */
+      await server.inject({
+        method: 'POST',
+        url: '/users',
+        payload: {
+          username: 'jack',
+          password: 'confidential',
+          fullname: 'Jack Sparrow',
+        },
+      });
+
+      /** login user jack */
+      const responseLoginJack = await server.inject({
+        method: 'POST',
+        url: '/authentications',
+        payload: {
+          username: 'jack',
+          password: 'confidential',
+        },
+      });
+
+      const jackAccessToken = JSON.parse(
+        responseLoginJack.payload
+      ).data.accessToken;
+
+      const jackRefreshToken = JSON.parse(
+        responseLoginJack.payload
+      ).data.refreshToken;
+
+      /** billy create thread */
+      const responseBillyCreateThread = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        payload: {
+          title: 'Some interesting topic',
+          body: 'Some engaging content',
+        },
+        headers: {
+          authorization: `Bearer ${billyAccessToken}`,
+        },
+      });
+
+      const billyThreadId = JSON.parse(
+        responseBillyCreateThread.payload,
+      ).data.addedThread.id;
+
+      const billyThreadTimestamp = await ThreadsTableTestHelper.getThreadTimetamp(billyThreadId);
+
+      /** jack comment on billy thread */
+      const responseJackComment = await server.inject({
+        method: 'POST',
+        url: `/threads/${billyThreadId}/comments`,
+        payload: {
+          content: 'Sangat menarik!!',
+        },
+        headers: {
+          authorization: `Bearer ${jackAccessToken}`,
+        },
+      });
+
+      const jackCommentId = JSON.parse(
+        responseJackComment.payload,
+      ).data.addedComment.id;
+
+      const jackCommentTimeStamp = await CommentTableTestHelper.getCommentTimestamp(jackCommentId);
+
+      /** billy comment on billy thread */
+      const responseBillyComment = await server.inject({
+        method: 'POST',
+        url: `/threads/${billyThreadId}/comments`,
+        payload: {
+          content: 'Ingat beli minyak di warung',
+        },
+        headers: {
+          authorization: `Bearer ${billyAccessToken}`,
+        },
+      });
+
+      const billyCommentId = JSON.parse(
+        responseBillyComment.payload
+      ).data.addedComment.id;
+
+      const billyCommentTimestamp = await CommentTableTestHelper.getCommentTimestamp(billyCommentId);
+
+      /** billy delete the comment */
+      await server.inject({
+        method: 'DELETE',
+        url: `/threads/${billyThreadId}/comments/${billyCommentId}`,
+        headers: {
+          authorization: `Bearer ${billyAccessToken}`,
+        },
+      });
+
+      // Action
+      const response = await server.inject({
+        method: 'GET',
+        url: `/threads/${billyThreadId}`
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+      expect(responseJson.data).toBeDefined();
+      expect(responseJson.data.thread).toBeDefined();
+      expect(responseJson.data.thread).toEqual(expect.objectContaining({
+        id: billyThreadId,
+        title: 'Some interesting topic',
+        body: 'Some engaging content',
+        date: billyThreadTimestamp,
+        username: 'billy',
+        comments: [
+          {
+            id: jackCommentId,
+            username: 'jack',
+            date: jackCommentTimeStamp,
+            content: 'Sangat menarik!!',
+          },
+          {
+            id: billyCommentId,
+            username: 'billy',
+            date: billyCommentTimestamp,
+            content: '** Komentar telah dihapus **',
+          },
+        ],
+      }));
+
+      /** logout jack */
+      await server.inject({
+        method: 'DELETE',
+        url: '/authentications',
+        payload: {
+          refreshToken: jackRefreshToken,
+        }
+      });
+    });
   })
-})
+});

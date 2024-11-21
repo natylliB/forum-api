@@ -28,11 +28,28 @@ const ThreadsTableTestHelper = {
     date = new Date().toISOString(),
   }) {
     const query = {
-      text: 'INSERT INTO threads VALUES($1, $2, $3, $4, $5)',
+      text: 'INSERT INTO threads VALUES($1, $2, $3, $4, $5) returning date',
       values: [id, title, body, owner, date],
     };
 
-    await pool.query(query);
+    const result = await pool.query(query);
+    return result.rows[0].date.toISOString();
+  },
+  async getThreadTimetamp(id) {
+    const query = {
+      text: `
+        SELECT
+          TO_CHAR(date AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS date
+        FROM
+          threads
+        WHERE
+          id = $1
+      `,
+      values: [id],
+    };
+
+    const result = await pool.query(query);
+    return result.rows[0].date;
   }
 }
 
