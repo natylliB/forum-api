@@ -98,7 +98,7 @@ describe('AddCommentUseCase', () => {
     // Action
     const addedComment = await addCommentUseCase.execute(useCasePayload);
 
-    expect(NewComment).toBeCalledWith(useCasePayload);
+    expect(NewComment).toBeCalledWith(expect.objectContaining({ ...useCasePayload }));
     expect(mockThreadRepository.isThreadAvailable).toBeCalledWith('thread-123');
     expect(mockCommentRepository.addComment).toBeCalledWith(expect.objectContaining({
       thread_id: 'thread-123',

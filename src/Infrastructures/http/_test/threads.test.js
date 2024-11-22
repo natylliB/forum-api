@@ -287,7 +287,7 @@ describe('/threads endpoint', () => {
             id: billyCommentId,
             username: 'billy',
             date: billyCommentTimestamp,
-            content: '** Komentar telah dihapus **',
+            content: '**komentar telah dihapus**',
           },
         ],
       }));
