@@ -150,6 +150,7 @@ describe('/threads/{threadId}/comments/{commentId}/replies endpoint', () => {
       const replies = await RepliesTableTestHelper.findReplyById(responseJson.data.addedReply.id);
       expect(replies).toHaveLength(1);
     });
+
     it('should response 404 when thread is not valid', async () => {
       // Action
       /** Billy reply Jack's comment */
@@ -169,6 +170,7 @@ describe('/threads/{threadId}/comments/{commentId}/replies endpoint', () => {
       expect(responseJson.status).toEqual('fail');
       expect(responseJson.message).toEqual('Thread tidak ditemukan');
     });
+
     it('should response 404 when comment to reply is not valid', async () => {
       // Action
       /** Billy reply Jack's comment */
@@ -189,6 +191,7 @@ describe('/threads/{threadId}/comments/{commentId}/replies endpoint', () => {
       expect(responseJson.status).toEqual('fail');
       expect(responseJson.message).toEqual('Komentar tidak ditemukan');
     });
+
     it('should response 400 when sending emtpy reply', async () => {
       // Action
       /** Billy reply Jack's comment */
@@ -211,9 +214,117 @@ describe('/threads/{threadId}/comments/{commentId}/replies endpoint', () => {
     });
   });
   describe('when DELETE /threads/{threadId}/comments/{commentId}/replies/{replyId}', () => {
-    it.todo('should response 200 with status success');
-    it.todo('should response 403 when deleting not your own comment');
-    it.todo('should response 404 when thread is not valid');
-    it.todo('should response 404 when comment of the reply is not valid');
+    let addedReplyId = '';
+
+    beforeEach(async () => {
+      /** Billy reply Jack's comment */
+      const replyResponse = await server.inject({
+        method: 'POST',
+        url: `/threads/${addedThreadId}/comments/${addedCommentId}/replies`,
+        payload: {
+          content: 'A critical reply',
+        },
+        headers: {
+          authorization: `Bearer ${billyAccessToken}`,
+        },
+      });
+
+      addedReplyId = JSON.parse(
+        replyResponse.payload
+      ).data.addedReply.id;
+    });
+
+    it('should response 200 with status success and soft delete reply correctly', async () => {
+      // Action
+      /** Billy try delete his own comment */
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${addedThreadId}/comments/${addedCommentId}/replies/${addedReplyId}`,
+        headers: {
+          authorization: `Bearer ${billyAccessToken}`,
+        },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+
+      const replies = await RepliesTableTestHelper.findReplyById(addedReplyId);
+      expect(replies).toHaveLength(1);
+      expect(replies[0].is_delete).toEqual(true);
+    });
+
+    it('should response 403 when deleting not your own reply', async () => {
+      // Action
+      /** Jack try delete Billy's comment */
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${addedThreadId}/comments/${addedCommentId}/replies/${addedReplyId}`,
+        headers: {
+          authorization: `Bearer ${jackAccessToken}`,
+        },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(403);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('Anda tidak berhak untuk mengubah balasan komentar ini');
+    });
+
+    it('should response 404 when thread is not valid', async () => {
+      // Action
+      /** Billy try delete his own comment with invalid threadId */
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/unknown-threads/comments/${addedCommentId}/replies/${addedReplyId}`,
+        headers: {
+          authorization: `Bearer ${billyAccessToken}`,
+        },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('Thread tidak ditemukan');
+    });
+
+    it('should response 404 when comment of the reply is not valid', async () => {
+      // Action
+      /** Billy try to delete his comment with invalid commentId */
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${addedThreadId}/comments/invalid-comment/replies/${addedReplyId}`,
+        headers: {
+          authorization: `Bearer ${billyAccessToken}`,
+        },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('Komentar tidak ditemukan');
+    });
+
+    it('should response 404 when the replyId to delete is invalid', async () => {
+      // Action
+      /** Billy try to delete his comment with invalid replyId */
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${addedThreadId}/comments/${addedCommentId}/replies/invalid-reply`,
+        headers: {
+          authorization: `Bearer ${billyAccessToken}`,
+        },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('Balasan komentar tidak ditemukan');
+    });
   });
 });

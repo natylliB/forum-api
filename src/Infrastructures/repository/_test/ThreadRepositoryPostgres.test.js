@@ -5,6 +5,7 @@ const pool = require('../../database/postgres/pool');
 const Thread = require('../../../Domains/threads/entities/Thread');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
 const CommentTableTestHelper = require('../../../../tests/CommentTableTestHelper');
+const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 
 describe('ThreadRepositoryPostgres', () => {
   beforeAll(async () => {
@@ -102,6 +103,25 @@ describe('ThreadRepositoryPostgres', () => {
       /** delete comment-124 */
       await CommentTableTestHelper.deleteComment('comment-124');
 
+      /** reply to comment-123 by billy (user-123) */
+      const billyReplyTimestamp  = await RepliesTableTestHelper.addReply({
+        id: 'reply-123',
+        comment_id: 'comment-123',
+        content: 'Thank You!',
+        owner: 'user-123',
+      });
+
+      /** reply to comment 123 by jack (user-124) */
+      const jackReplyTimestamp = await RepliesTableTestHelper.addReply({
+        id: 'reply-124',
+        comment_id: 'comment-123',
+        content: 'Some crude joke',
+        owner: 'user-124',
+      })
+
+      /** jack (user-124) delete his own reply (reply-124)  */
+      await RepliesTableTestHelper.deleteReply('reply-124');
+
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
       // Action
@@ -119,16 +139,31 @@ describe('ThreadRepositoryPostgres', () => {
             id: 'comment-123',
             username: 'jack',
             date: jackCommentTimeStamp,
+            replies: [
+              {
+                id: 'reply-123',
+                content: 'Thank You!',
+                date: billyReplyTimestamp,
+                username: 'billy',
+              },
+              {
+                id: 'reply-124',
+                content: '**balasan telah dihapus**',
+                date: jackReplyTimestamp,
+                username: 'jack'
+              }
+            ],
             content: 'Interesting insights',
           },
           {
             id: 'comment-124',
             username: 'billy',
             date: billyCommentTimestamp,
+            replies: [],
             content: '**komentar telah dihapus**',
           },
         ],
       }));
     });
-  })
+  });
 });

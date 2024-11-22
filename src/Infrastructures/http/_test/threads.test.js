@@ -5,6 +5,7 @@ const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const AuthenticationsTableTestHelper = require('../../../../tests/AuthenticationsTableTestHelper');
 const CommentTableTestHelper = require('../../../../tests/CommentTableTestHelper');
+const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 
 describe('/threads endpoint', () => {
   let server = null;
@@ -163,6 +164,7 @@ describe('/threads endpoint', () => {
       expect(responseJson.status).toEqual('fail');
       expect(responseJson.message).toEqual('Thread tidak ditemukan');
     });
+
     it('should response 200 with expected thread detail', async () => {
       // Arrange
       /** create user jack */
@@ -258,6 +260,51 @@ describe('/threads endpoint', () => {
         },
       });
 
+      /** billy reply on jack's comment */
+      const billyReplyResponse = await server.inject({
+        method: 'POST',
+        url: `/threads/${billyThreadId}/comments/${jackCommentId}/replies`,
+        payload: {
+          content: 'Terima Kasih!',
+        },
+        headers: {
+          authorization: `Bearer ${billyAccessToken}`,
+        }
+      });
+
+      const billyReplyId = JSON.parse(
+        billyReplyResponse.payload
+      ).data.addedReply.id;
+
+      const billyReplyTimestamp = await RepliesTableTestHelper.getReplyTimestamp(billyReplyId);
+
+      /** jack reply on jack's comment */
+      const jackReplyResponse = await server.inject({
+        method: 'POST',
+        url: `/threads/${billyThreadId}/comments/${jackCommentId}/replies`,
+        payload: {
+          content: 'Sesuatu candaan yang sensitif',
+        },
+        headers: {
+          authorization: `Bearer ${jackAccessToken}`,
+        }
+      });
+
+      const jackReplyId = JSON.parse(
+        jackReplyResponse.payload
+      ).data.addedReply.id;
+
+      const jackReplyTimestamp = await RepliesTableTestHelper.getReplyTimestamp(jackReplyId);
+
+      /** jack delete his own comment */
+      await server.inject({
+        method: 'DELETE',
+        url: `/threads/${billyThreadId}/comments/${jackCommentId}/replies/${jackReplyId}`,
+        headers: {
+          authorization: `Bearer ${jackAccessToken}`,
+        },
+      });
+
       // Action
       const response = await server.inject({
         method: 'GET',
@@ -281,12 +328,27 @@ describe('/threads endpoint', () => {
             id: jackCommentId,
             username: 'jack',
             date: jackCommentTimeStamp,
+            replies: [
+              {
+                id: billyReplyId,
+                content: 'Terima Kasih!',
+                date: billyReplyTimestamp,
+                username: 'billy',
+              },
+              {
+                id: jackReplyId,
+                content: '**balasan telah dihapus**',
+                date: jackReplyTimestamp,
+                username: 'jack'
+              }
+            ],
             content: 'Sangat menarik!!',
           },
           {
             id: billyCommentId,
             username: 'billy',
             date: billyCommentTimestamp,
+            replies: [],
             content: '**komentar telah dihapus**',
           },
         ],

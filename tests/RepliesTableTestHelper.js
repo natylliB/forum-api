@@ -24,8 +24,8 @@ const RepliesTableTestHelper = {
   },
   async deleteReply(id) {
     const query = {
-      text: 'UPDATE replies SET is_delete WHERE id = $1',
-      values: [id],
+      text: 'UPDATE replies SET is_delete = $1 WHERE id = $2',
+      values: [true, id],
     };
 
     await pool.query(query);
@@ -34,7 +34,7 @@ const RepliesTableTestHelper = {
     const query = {
       text: `
         SELECT
-          TO_CHAR(date AT TIMEZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS date
+          TO_CHAR(date AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS date
         FROM
           replies
         WHERE

@@ -8,6 +8,8 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     this._idGenerator = idGenerator;
 
     this.addReply = this.addReply.bind(this);
+    this.isReplyAvailableInComment = this.isReplyAvailableInComment.bind(this);
+    this.isReplyOwnerValid = this.isReplyOwnerValid.bind(this);
   }
 
   async addReply({ comment_id, content, date, owner }){
@@ -22,6 +24,35 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     const addedReply = new AddedReply({ ...result.rows[0] });
 
     return addedReply;
+  }
+
+  async isReplyAvailableInComment(id, commentId) {
+    const query = {
+      text: 'SELECT EXISTS(SELECT 1 FROM replies WHERE id = $1 AND comment_id = $2)',
+      values: [id, commentId],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows[0].exists;
+  }
+
+  async isReplyOwnerValid(id, userId) {
+    const query = {
+      text: 'SELECT EXISTS(SELECT 1 FROM replies WHERE id = $1 AND owner = $2)',
+      values: [id, userId],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows[0].exists;
+  }
+
+  async deleteReply(id) {
+    const query = {
+      text: 'UPDATE replies SET is_delete = $1 WHERE id = $2',
+      values: [true, id],
+    };
+
+    await this._pool.query(query);
   }
 }
 

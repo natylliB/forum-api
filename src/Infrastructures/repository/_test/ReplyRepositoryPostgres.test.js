@@ -75,4 +75,103 @@ describe('ReplyRepositoryPostgres', () => {
       }));
     });
   });
+
+  describe('isReplyAvailableInComment function', () => {
+    beforeEach(async () => {
+      // Add Reply form billy (user-123)
+      await RepliesTableTestHelper.addReply({
+        id: 'reply-123',
+        comment_id: 'comment-123',
+        content: 'A critical reply',
+        owner: 'user-123',
+        date: new Date().toISOString(),
+      });
+    });
+
+    it('should resolve false when the reply is not in the comment', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action
+      const isReplyAvailableInComment = await replyRepositoryPostgres.isReplyAvailableInComment('reply-456', 'comment-123');
+
+      // Assert
+      expect(isReplyAvailableInComment).toEqual(false);
+    });
+
+    it('should resolve true when the reply is in the comment', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action
+      const isReplyAvailableInComment = await replyRepositoryPostgres.isReplyAvailableInComment('reply-123', 'comment-123');
+
+      // Assert
+      expect(isReplyAvailableInComment).toEqual(true);
+    });
+  });
+
+  describe('isReplyOwnerValid function', () => {
+    beforeEach(async () => {
+      // Add Reply form billy (user-123)
+      await RepliesTableTestHelper.addReply({
+        id: 'reply-123',
+        comment_id: 'comment-123',
+        content: 'A critical reply',
+        owner: 'user-123',
+        date: new Date().toISOString(),
+      });
+    });
+
+    it('should resolve false if reply owner is invalid', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action
+      /** Jack (user-456) */
+      const isReplyOwnerValid = await replyRepositoryPostgres.isReplyOwnerValid('reply-123', 'user-456')
+
+      // Assert
+      expect(isReplyOwnerValid).toEqual(false);
+    });
+
+    it('should resolve true if reply owner is valid', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action
+      /** Billy (user-123) */
+      const isReplyOwnerValid = await replyRepositoryPostgres.isReplyOwnerValid('reply-123', 'user-123');
+
+      // Assert
+      expect(isReplyOwnerValid).toEqual(true);
+    });
+  });
+
+  describe('deleteReply function', () => {
+    beforeEach(async () => {
+      // Add Reply form billy (user-123)
+      await RepliesTableTestHelper.addReply({
+        id: 'reply-123',
+        comment_id: 'comment-123',
+        content: 'A critical reply',
+        owner: 'user-123',
+        date: new Date().toISOString(),
+      });
+    });
+
+    it('should soft-delete reply correctly', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(
+        replyRepositoryPostgres.deleteReply('reply-123')
+      ).resolves.not.toThrow();
+
+      const replies = await RepliesTableTestHelper.findReplyById('reply-123');
+      expect(replies).toHaveLength(1);
+      expect(replies[0].is_delete).toEqual(true);
+    });
+  });
 });
