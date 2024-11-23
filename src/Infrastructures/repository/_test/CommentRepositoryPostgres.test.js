@@ -6,6 +6,7 @@ const ThreadTableTestHelper = require('../../../../tests/ThreadsTableTestHelper'
 const NewComment = require('../../../Domains/comments/entities/NewComment');
 const AddedComment = require('../../../Domains/comments/entities/AddedComment');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
+const InvariantError = require('../../../Commons/exceptions/InvariantError');
 
 describe('CommentRepositoryPostgres', () => {
   beforeAll(async () => {
@@ -50,6 +51,60 @@ describe('CommentRepositoryPostgres', () => {
         content: 'Some Top Rated Comment',
         owner: 'user-123',
       }));
+    });
+
+    it('should throw InvariantError when content property is missing', async () => {
+      // Arrange
+      const payload = {
+        thread_id: 'thread-123',
+        owner: 'user-123',
+        date: new Date().toISOString(),
+      };
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(
+        commentRepositoryPostgres.addComment(payload)
+      ).rejects.toThrowError(
+        new InvariantError('Tidak dapat menambahkan komentar, karena properti yang dibutuhkan tidak ada')
+      )
+    });
+
+    it('should throw InvariantError when content property not met data type specification', async () => {
+      const payload = {
+        thread_id: 'thread-123',
+        content: [''],
+        owner: 'user-123',
+        date: new Date().toISOString(),
+      };
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(
+        commentRepositoryPostgres.addComment(payload)
+      ).rejects.toThrowError(
+        new InvariantError('Tidak dapat menambahkan komentar, karena tipe data tidak sesuai')
+      );
+    }); 
+
+    it('should throw InvariantError when content property is empty', async () => {
+      const payload = {
+        thread_id: 'thread-123',
+        content: '',
+        owner: 'user-123',
+        date: new Date().toISOString(),
+      };
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(
+        commentRepositoryPostgres.addComment(payload)
+      ).rejects.toThrowError(
+        new InvariantError('Tidak dapat menambahkan komentar, komentar tidak boleh kosong')
+      );
     });
   });
 

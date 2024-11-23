@@ -6,6 +6,7 @@ const Thread = require('../../../Domains/threads/entities/Thread');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
 const CommentTableTestHelper = require('../../../../tests/CommentTableTestHelper');
 const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('ThreadRepositoryPostgres', () => {
   beforeAll(async () => {
@@ -49,26 +50,26 @@ describe('ThreadRepositoryPostgres', () => {
     });
   });
 
-  describe('isThreadAvailable function', () => {
-    it('should resolve false if thread is not available', async () => {
+  describe('checkThreadAvailability function', () => {
+    it('should throw NotFoundError when the thread is not found', async () => {
       // Arrange
       await ThreadsTableTestHelper.addThread({ id: 'thread-123', owner: 'user-123' });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
-      // Action
-      const isThreadAvailable = await threadRepositoryPostgres.isThreadAvailable('thread-456');
-
-      expect(isThreadAvailable).toEqual(false);
+      // Action & Assert
+      await expect(
+        threadRepositoryPostgres.checkThreadAvailability('thread-456')
+      ).rejects.toThrowError(new NotFoundError('Thread tidak ditemukan'));
     });
-    it('should resolve true if thread is available', async () => {
+    it('should not throw NotFoundError when the thread is available', async () => {
       // Arrange
       await ThreadsTableTestHelper.addThread({ id: 'thread-123', owner: 'user-123' });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
-      // Action
-      const isThreadAvailable = await threadRepositoryPostgres.isThreadAvailable('thread-123');
-
-      expect(isThreadAvailable).toEqual(true);
+      // Action & Assert
+      await expect(
+        threadRepositoryPostgres.checkThreadAvailability('thread-123')
+      ).resolves.not.toThrowError(new NotFoundError('Thread tidak ditemukan'));
     });
   });
 
