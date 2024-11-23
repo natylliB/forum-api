@@ -8,6 +8,7 @@ const Reply = require('../../../Domains/replies/entities/Reply');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
+const InvariantError = require('../../../Commons/exceptions/InvariantError');
 
 describe('ReplyRepositoryPostgres', () => {
   beforeAll(async () => {
@@ -89,7 +90,9 @@ describe('ReplyRepositoryPostgres', () => {
       // Action & Assert
       await expect(
         replyRepositoryPostgres.addReply(payload)
-      ).rejects.toThrowError('Balasan komentar tidak boleh kosong');
+      ).rejects.toThrowError(
+        new InvariantError('Balasan komentar tidak boleh kosong')
+      );
     })
   });
 
@@ -112,7 +115,9 @@ describe('ReplyRepositoryPostgres', () => {
       // Action & Assert
       await expect(
         replyRepositoryPostgres.checkReplyAvailabilityInComment('reply-456', 'comment-123')
-      ).rejects.toThrowError('Balasan komentar tidak ditemukan');
+      ).rejects.toThrowError(
+        new NotFoundError('Balasan komentar tidak ditemukan')
+      );
     });
 
     it('should resolve when the reply is in the comment', async () => {
@@ -122,7 +127,9 @@ describe('ReplyRepositoryPostgres', () => {
       // Action & Assert
       await expect(
         replyRepositoryPostgres.checkReplyAvailabilityInComment('reply-123', 'comment-123')
-      ).resolves.not.toThrowError(new NotFoundError('Balasan komentar tidak ditemukan'));
+      ).resolves.not.toThrowError(
+        new NotFoundError('Balasan komentar tidak ditemukan')
+      );
     });
   });
 

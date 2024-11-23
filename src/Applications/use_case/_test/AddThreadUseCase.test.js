@@ -8,11 +8,12 @@ jest.mock('../../../Domains/threads/entities/Thread');
 describe('AddThreadUseCase', () => {
   it('should orchestrate the add thead process correctly', async () => {
     // Arrange
+    const addThreadTimestamp = new Date().toISOString();
     const payload = {
       title: 'Some Topic',
       body: 'Some Content',
       owner: 'user-123',
-      date: new Date().toISOString(),
+      date: addThreadTimestamp,
     };
     
     // mock thread constructor behavior
@@ -41,7 +42,13 @@ describe('AddThreadUseCase', () => {
     const addedThread = await addThreadUseCase.execute(payload);
 
     // Assert
-    expect(Thread).toBeCalledWith(payload);
+    expect(Thread).toBeCalledWith(expect.objectContaining({
+      title: 'Some Topic',
+      body: 'Some Content',
+      owner: 'user-123',
+      date: addThreadTimestamp,
+    }));
+    
     expect(mockThreadRepository.addThread).toBeCalledWith(
       expect.objectContaining({
         title: 'Some Topic',

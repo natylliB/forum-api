@@ -152,7 +152,9 @@ describe('CommentRepositoryPostgres', () => {
       // Action & Assert
       await expect(
         commentRepositoryPostgres.checkCommentOwnership('comment-123', 'user-123')
-      ).resolves.not.toThrow();
+      ).resolves.not.toThrowError(
+        new AuthorizationError('Anda tidak berhak melakukan perubahan pada komentar ini')
+      );
     });
   });
 
