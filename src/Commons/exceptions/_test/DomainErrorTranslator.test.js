@@ -15,17 +15,13 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new InvariantError('tidak dapat membuat thread baru karena properti yang dibutuhkan tidak ada'));
     expect(DomainErrorTranslator.translate(new Error('NEW_THREAD.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('tidak dapat membuat thread baru karena tipe data tidak sesuai'));
-    expect(DomainErrorTranslator.translate(new Error('REPLY.NOT_CONTAIN_REQUIRED_PROPERTY')))
-      .toStrictEqual(new InvariantError('tidak dapat membuat balasan komentar karena properti yang dibutuhkan tidak ada'));
-    expect(DomainErrorTranslator.translate(new Error('REPLY.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION')))
-      .toStrictEqual(new InvariantError('tidak dapat membuat balasan komentar karena tipe data tidak sesuai'));
     expect(DomainErrorTranslator.translate(new Error('NEW_COMMENT.CONTENT_UNDEFINED')))
       .toStrictEqual(new InvariantError('tidak dapat menambahkan komentar karena properti yang dibutuhkan tidak ada'));
     expect(DomainErrorTranslator.translate(new Error('NEW_COMMENT.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('tidak dapat menambahkan komentar karena tipe data tidak sesuai'));
-    expect(DomainErrorTranslator.translate(new Error('REPLY.CONTENT_UNDEFINED')))
+    expect(DomainErrorTranslator.translate(new Error('NEW_REPLY.CONTENT_UNDEFINED')))
       .toStrictEqual(new InvariantError('tidak dapat menambahkan balasan karena properti yang dibutuhkan tidak ada'));
-    expect(DomainErrorTranslator.translate(new Error('REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION')))
+    expect(DomainErrorTranslator.translate(new Error('NEW_REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('tidak dapat menambahkan balasan karena tipe data tidak sesuai'));
   });
 

@@ -1,4 +1,4 @@
-const Reply = require("../../Domains/replies/entities/Reply");
+const NewReply = require("../../Domains/replies/entities/NewReply");
 
 class AddReplyUseCase {
   constructor({
@@ -12,7 +12,7 @@ class AddReplyUseCase {
   }
 
   async execute({ thread_id, comment_id, content, owner, date }) {
-    const newReply = new Reply({ comment_id, content, owner, date })
+    const newReply = new NewReply({ comment_id, content, owner, date })
 
     await this._threadRepository.checkThreadAvailability(thread_id);
     

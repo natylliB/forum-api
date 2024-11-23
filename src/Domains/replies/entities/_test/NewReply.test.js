@@ -1,4 +1,4 @@
-const Reply = require('../Reply');
+const NewReply = require('../NewReply');
 
 describe('Reply object { comment_id, content, owner, date }', () => {
   it('should throw error when not contain required property', () => {
@@ -10,7 +10,7 @@ describe('Reply object { comment_id, content, owner, date }', () => {
     };
 
     // Action & Assert
-    expect(() => new Reply(payload)).toThrowError('REPLY.NOT_CONTAIN_REQUIRED_PROPERTY');
+    expect(() => new NewReply(payload)).toThrowError('NEW_REPLY.NOT_CONTAIN_REQUIRED_PROPERTY');
   });
 
   it('should throw error when property not met data type specifications', () => {
@@ -22,7 +22,7 @@ describe('Reply object { comment_id, content, owner, date }', () => {
     };
 
     // Action & Assert
-    expect(() => new Reply(payload)).toThrowError('REPLY.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
+    expect(() => new NewReply(payload)).toThrowError('NEW_REPLY.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should throw error when reply content is missing', () => {
@@ -34,7 +34,7 @@ describe('Reply object { comment_id, content, owner, date }', () => {
     };
 
     // Action & Assert
-    expect(() => new Reply(payload)).toThrowError('REPLY.CONTENT_UNDEFINED');
+    expect(() => new NewReply(payload)).toThrowError('NEW_REPLY.CONTENT_UNDEFINED');
   });
 
   it('should throw error when reply content not met data type specification', () => {
@@ -47,7 +47,7 @@ describe('Reply object { comment_id, content, owner, date }', () => {
     };
 
     // Action & Assert 
-    expect(() => new Reply(payload)).toThrowError('REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
+    expect(() => new NewReply(payload)).toThrowError('NEW_REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should create Reply object correctly', () => {
@@ -60,7 +60,7 @@ describe('Reply object { comment_id, content, owner, date }', () => {
     };
 
     // Action
-    const { comment_id, content, owner, date } = new Reply(payload);
+    const { comment_id, content, owner, date } = new NewReply(payload);
 
     // Assert
     expect(comment_id).toEqual(payload.comment_id);

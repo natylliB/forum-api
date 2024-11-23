@@ -1,13 +1,11 @@
-const InvariantError = require('../../../Commons/exceptions/InvariantError');
-const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const AddReplyUseCase = require('../AddReplyUseCase');
-const Reply = require('../../../Domains/replies/entities/Reply');
+const NewReply = require('../../../Domains/replies/entities/NewReply');
 const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
 
-jest.mock('../../../Domains/replies/entities/Reply');
+jest.mock('../../../Domains/replies/entities/NewReply');
 
 describe('AddReplyUseCase', () => {
   it('should orchestrate reply comment correctly', async () => {
@@ -38,7 +36,7 @@ describe('AddReplyUseCase', () => {
     );
 
     /** mock Reply constructor call */
-    Reply.mockImplementation((payload) => ({
+    NewReply.mockImplementation((payload) => ({
       comment_id: payload.comment_id,
       content: payload.content,
       owner: payload.owner,
@@ -55,7 +53,7 @@ describe('AddReplyUseCase', () => {
     const addedReply = await addReplyUseCase.execute(useCasePayload);
 
     // Assert
-    expect(Reply).toBeCalledWith(expect.objectContaining({
+    expect(NewReply).toBeCalledWith(expect.objectContaining({
       comment_id: 'comment-123',
       content: 'A critical reply',
       owner: 'user-123',

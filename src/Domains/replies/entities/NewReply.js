@@ -1,4 +1,4 @@
-class Reply {
+class NewReply {
   constructor(payload) {
     this._verifyPayload(payload);
 
@@ -13,21 +13,21 @@ class Reply {
     const requiredProperties = [ comment_id, content, owner, date ];
 
     if (typeof content === 'undefined') {
-      throw new Error('REPLY.CONTENT_UNDEFINED');
+      throw new Error('NEW_REPLY.CONTENT_UNDEFINED');
     }
 
     if (typeof content !== 'string') {
-      throw new Error('REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
+      throw new Error('NEW_REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
     }
 
     if (requiredProperties.some(property => typeof property === 'undefined')) {
-      throw new Error('REPLY.NOT_CONTAIN_REQUIRED_PROPERTY');
+      throw new Error('NEW_REPLY.NOT_CONTAIN_REQUIRED_PROPERTY');
     }
     
     if (requiredProperties.some(property => typeof property !== 'string')) {
-      throw new Error('REPLY.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
+      throw new Error('NEW_REPLY.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
     }
   }
 }
 
-module.exports = Reply;
+module.exports = NewReply;

@@ -4,7 +4,7 @@ const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 const ReplyRepositoryPostgres = require('../ReplyRepositoryPostgres');
 const pool = require('../../database/postgres/pool');
-const Reply = require('../../../Domains/replies/entities/Reply');
+const NewReply = require('../../../Domains/replies/entities/NewReply');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
@@ -54,7 +54,7 @@ describe('ReplyRepositoryPostgres', () => {
   describe('addReply function', () => {
     it('should persist add reply correctly and return addedReply', async () => {
       // Arrange
-      const payload = new Reply({
+      const payload = new NewReply({
         comment_id: 'comment-123',
         content: 'A critical reply',
         owner: 'user-123',
@@ -79,7 +79,7 @@ describe('ReplyRepositoryPostgres', () => {
     });
     it('should throw InvariantError when trying to add empty reply', async () => {
       // Arrange
-      const payload = new Reply({
+      const payload = new NewReply({
         comment_id: 'comment-123',
         content: '',
         owner: 'user-123',
