@@ -1,4 +1,6 @@
+const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 const InvariantError = require('../../Commons/exceptions/InvariantError');
+const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const AddedReply = require('../../Domains/replies/entities/AddedReply');
 const ReplyRepository = require('../../Domains/replies/ReplyRepository');
 
@@ -10,8 +12,8 @@ class ReplyRepositoryPostgres extends ReplyRepository {
 
     this._verifiyReply = this._verifiyReply.bind(this);
     this.addReply = this.addReply.bind(this);
-    this.isReplyAvailableInComment = this.isReplyAvailableInComment.bind(this);
-    this.isReplyOwnerValid = this.isReplyOwnerValid.bind(this);
+    this.isReplyAvailableInComment = this.checkReplyAvailabilityInComment.bind(this);
+    this.isReplyOwnerValid = this.checkReplyOwnership.bind(this);
   }
 
   _verifiyReply(reply) {
@@ -35,24 +37,28 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     return addedReply;
   }
 
-  async isReplyAvailableInComment(id, commentId) {
+  async checkReplyAvailabilityInComment(id, commentId) {
     const query = {
       text: 'SELECT EXISTS(SELECT 1 FROM replies WHERE id = $1 AND comment_id = $2)',
       values: [id, commentId],
     };
 
     const result = await this._pool.query(query);
-    return result.rows[0].exists;
+    if (!result.rows[0].exists) {
+      throw new NotFoundError('Balasan komentar tidak ditemukan');
+    }
   }
 
-  async isReplyOwnerValid(id, userId) {
+  async checkReplyOwnership(id, userId) {
     const query = {
       text: 'SELECT EXISTS(SELECT 1 FROM replies WHERE id = $1 AND owner = $2)',
       values: [id, userId],
     };
 
     const result = await this._pool.query(query);
-    return result.rows[0].exists;
+    if (!result.rows[0].exists) {
+      throw new AuthorizationError('Anda tidak berhak untuk mengubah balasan komentar ini');
+    }
   }
 
   async deleteReply(id) {

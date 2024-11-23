@@ -2,10 +2,10 @@ class ReplyRepository {
   async addReply({ comment_id, content, owner, date }) {
     throw new Error('REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
-  async isReplyAvailableInComment(id, commentId) {
+  async checkReplyAvailabilityInComment(id, commentId) {
     throw new Error('REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
-  async isReplyOwnerValid(id, userId) {
+  async checkReplyOwnership(id, userId) {
     throw new Error('REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
   async deleteReply(id) {

@@ -6,6 +6,8 @@ const ReplyRepositoryPostgres = require('../ReplyRepositoryPostgres');
 const pool = require('../../database/postgres/pool');
 const Reply = require('../../../Domains/replies/entities/Reply');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 
 describe('ReplyRepositoryPostgres', () => {
   beforeAll(async () => {
@@ -91,7 +93,7 @@ describe('ReplyRepositoryPostgres', () => {
     })
   });
 
-  describe('isReplyAvailableInComment function', () => {
+  describe('checkReplyAvailabilityInComment function', () => {
     beforeEach(async () => {
       // Add Reply form billy (user-123)
       await RepliesTableTestHelper.addReply({
@@ -103,30 +105,28 @@ describe('ReplyRepositoryPostgres', () => {
       });
     });
 
-    it('should resolve false when the reply is not in the comment', async () => {
+    it('should throw NotFoundError when the reply is not in the comment', async () => {
       // Arrange
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
-      // Action
-      const isReplyAvailableInComment = await replyRepositoryPostgres.isReplyAvailableInComment('reply-456', 'comment-123');
-
-      // Assert
-      expect(isReplyAvailableInComment).toEqual(false);
+      // Action & Assert
+      await expect(
+        replyRepositoryPostgres.checkReplyAvailabilityInComment('reply-456', 'comment-123')
+      ).rejects.toThrowError('Balasan komentar tidak ditemukan');
     });
 
-    it('should resolve true when the reply is in the comment', async () => {
+    it('should resolve when the reply is in the comment', async () => {
       // Arrange
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
-      // Action
-      const isReplyAvailableInComment = await replyRepositoryPostgres.isReplyAvailableInComment('reply-123', 'comment-123');
-
-      // Assert
-      expect(isReplyAvailableInComment).toEqual(true);
+      // Action & Assert
+      await expect(
+        replyRepositoryPostgres.checkReplyAvailabilityInComment('reply-123', 'comment-123')
+      ).resolves.not.toThrowError(new NotFoundError('Balasan komentar tidak ditemukan'));
     });
   });
 
-  describe('isReplyOwnerValid function', () => {
+  describe('checkReplyOwnership function', () => {
     beforeEach(async () => {
       // Add Reply form billy (user-123)
       await RepliesTableTestHelper.addReply({
@@ -138,28 +138,30 @@ describe('ReplyRepositoryPostgres', () => {
       });
     });
 
-    it('should resolve false if reply owner is invalid', async () => {
+    it('should throw AuthorizationError if reply owner is invalid', async () => {
       // Arrange
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
-      // Action
+      // Action & Assert
       /** Jack (user-456) */
-      const isReplyOwnerValid = await replyRepositoryPostgres.isReplyOwnerValid('reply-123', 'user-456')
-
-      // Assert
-      expect(isReplyOwnerValid).toEqual(false);
+      await expect(
+        replyRepositoryPostgres.checkReplyOwnership('reply-123', 'user-456')
+      ).rejects.toThrowError(
+        new AuthorizationError('Anda tidak berhak untuk mengubah balasan komentar ini')
+      );
     });
 
-    it('should resolve true if reply owner is valid', async () => {
+    it('should resolve if reply owner is valid', async () => {
       // Arrange
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
-      // Action
+      // Action & Assert
       /** Billy (user-123) */
-      const isReplyOwnerValid = await replyRepositoryPostgres.isReplyOwnerValid('reply-123', 'user-123');
-
-      // Assert
-      expect(isReplyOwnerValid).toEqual(true);
+      await expect(
+        replyRepositoryPostgres.checkReplyOwnership('reply-123', 'user-123')
+      ).resolves.not.toThrowError(
+        new AuthorizationError('Anda tidak berhak untuk mengubah balasan komentar ini')
+      );
     });
   });
 

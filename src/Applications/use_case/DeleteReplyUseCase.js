@@ -1,6 +1,3 @@
-const AuthorizationError = require("../../Commons/exceptions/AuthorizationError");
-const NotFoundError = require("../../Commons/exceptions/NotFoundError");
-
 class DeleteReplyUseCase {
   constructor({
     threadRepository,
@@ -20,29 +17,14 @@ class DeleteReplyUseCase {
     replyId,
     owner
   }) {
-    // check if thread is available
-    const isThreadAvailable = await this._threadRepository.isThreadAvailable(threadId);
-    if (!isThreadAvailable) {
-      throw new NotFoundError('Thread tidak ditemukan');
-    }
+    
+    await this._threadRepository.checkThreadAvailability(threadId);
 
-    // check if the comment of the replies is in the mentioned thread
-    const isCommentAvailableInThread = await this._commentRepository.isCommentAvailableInThread(commentId, threadId);
-    if (!isCommentAvailableInThread) {
-      throw new NotFoundError('Komentar tidak ditemukan');
-    }
+    await this._commentRepository.checkCommentAvailabilityInThread(commentId, threadId);
 
-    // check if the said reply available in the comment
-    const isReplyAvailableInComment = await this._replyRepository.isReplyAvailableInComment(replyId, commentId);
-    if (!isReplyAvailableInComment) {
-      throw new NotFoundError('Balasan komentar tidak ditemukan');
-    }
+    await this._replyRepository.checkReplyAvailabilityInComment(replyId, commentId);
 
-    // check if this owner is authorized to modify the reply
-    const isReplyOwnerValid = await this._replyRepository.isReplyOwnerValid(replyId, owner);
-    if (!isReplyOwnerValid) {
-      throw new AuthorizationError('Anda tidak berhak untuk mengubah balasan komentar ini');
-    }
+    await this._replyRepository.checkReplyOwnership(replyId, owner);
 
     await this._replyRepository.deleteReply(replyId);
   }
