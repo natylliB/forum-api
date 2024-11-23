@@ -143,7 +143,7 @@ describe('/coments endpoint', () => {
       const responseJson = JSON.parse(response.payload);
       expect(response.statusCode).toEqual(400);
       expect(responseJson.status).toEqual('fail');
-      expect(responseJson.message).toEqual('Tidak dapat menambahkan komentar, karena properti yang dibutuhkan tidak ada');
+      expect(responseJson.message).toEqual('tidak dapat menambahkan komentar karena properti yang dibutuhkan tidak ada');
     });
 
     it('should response 400 when request body not met data type specification', async () => {
@@ -165,7 +165,7 @@ describe('/coments endpoint', () => {
       const responseJson = JSON.parse(response.payload);
       expect(response.statusCode).toEqual(400);
       expect(responseJson.status).toEqual('fail');
-      expect(responseJson.message).toEqual('Tidak dapat menambahkan komentar, karena tipe data tidak sesuai');
+      expect(responseJson.message).toEqual('tidak dapat menambahkan komentar karena tipe data tidak sesuai');
     });
 
     it('should response 400 when request body comment is empty', async () => {
@@ -187,7 +187,7 @@ describe('/coments endpoint', () => {
       const responseJson = JSON.parse(response.payload);
       expect(response.statusCode).toEqual(400);
       expect(responseJson.status).toEqual('fail');
-      expect(responseJson.message).toEqual('Tidak dapat menambahkan komentar, komentar tidak boleh kosong');
+      expect(responseJson.message).toEqual('tidak dapat menambahkan komentar, komentar tidak boleh kosong');
     });
 
     it('should response 201 with addedComment', async () => {

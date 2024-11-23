@@ -1,3 +1,4 @@
+const InvariantError = require('../../Commons/exceptions/InvariantError');
 const AddedReply = require('../../Domains/replies/entities/AddedReply');
 const ReplyRepository = require('../../Domains/replies/ReplyRepository');
 
@@ -7,14 +8,22 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     this._pool = pool;
     this._idGenerator = idGenerator;
 
+    this._verifiyReply = this._verifiyReply.bind(this);
     this.addReply = this.addReply.bind(this);
     this.isReplyAvailableInComment = this.isReplyAvailableInComment.bind(this);
     this.isReplyOwnerValid = this.isReplyOwnerValid.bind(this);
   }
 
-  async addReply({ comment_id, content, date, owner }){
-    const id = `reply-${this._idGenerator()}`;
+  _verifiyReply(reply) {
+    if (reply.length === 0) {
+      throw new InvariantError('Balasan komentar tidak boleh kosong');
+    }
+  }
 
+  async addReply({ comment_id, content, date, owner }){
+    this._verifiyReply(content);
+
+    const id = `reply-${this._idGenerator()}`;
     const query = {
       text: 'INSERT INTO replies VALUES($1, $2, $3, $4, $5) returning id, content, owner',
       values: [ id, comment_id, content, date, owner ],

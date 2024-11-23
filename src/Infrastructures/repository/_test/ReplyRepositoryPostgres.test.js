@@ -74,6 +74,21 @@ describe('ReplyRepositoryPostgres', () => {
         owner: 'user-123',
       }));
     });
+    it('should throw InvariantError when trying to add empty reply', async () => {
+      // Arrange
+      const payload = new Reply({
+        comment_id: 'comment-123',
+        content: '',
+        owner: 'user-123',
+        date: new Date().toISOString(),
+      });
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+      
+      // Action & Assert
+      await expect(
+        replyRepositoryPostgres.addReply(payload)
+      ).rejects.toThrowError('Balasan komentar tidak boleh kosong');
+    })
   });
 
   describe('isReplyAvailableInComment function', () => {

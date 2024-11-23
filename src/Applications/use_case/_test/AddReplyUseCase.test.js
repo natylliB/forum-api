@@ -10,146 +10,6 @@ const AddedReply = require('../../../Domains/replies/entities/AddedReply');
 jest.mock('../../../Domains/replies/entities/Reply');
 
 describe('AddReplyUseCase', () => {
-  it('should throw NotFoundError when the thread is not valid', async () => {
-    // Arrange
-    /** mock required depedencies */
-    const mockThreadRepository = new ThreadRepository();
-
-    /** mock required depedencies functions */
-    mockThreadRepository.isThreadAvailable = jest.fn().mockResolvedValue(false);
-
-    const addReplyUseCase = new AddReplyUseCase({
-      threadRepository: mockThreadRepository,
-      commentRepository: {},
-      replyRepository: {}
-    });
-
-    // Action & Assert
-    /** addReplyUseCase.execute({ thread_id, comment_id, content, owner, date }) */
-    await expect(
-      addReplyUseCase.execute({
-        thread_id: 'invalidThreadId', 
-        comment_id: 'commentId', 
-        content: 'reply',
-        owner: 'owner',
-        date: 'some ISO date',
-      })
-    ).rejects.toThrowError(
-      new NotFoundError('Thread tidak ditemukan')
-    );
-  });
-
-  it('should throw NotFoundError when the comment to reply is not valid', async () => {
-    // Arrange
-    /** mock required depedencies */
-    const mockThreadRepository = new ThreadRepository();
-    const mockCommentRepository = new CommentRepository();
-
-    /** mock required depedencies functions */
-    mockThreadRepository.isThreadAvailable = jest.fn().mockResolvedValue(true);
-    mockCommentRepository.isCommentAvailableInThread = jest.fn().mockResolvedValue(false);
-
-    const addReplyUseCase = new AddReplyUseCase({
-      threadRepository: mockThreadRepository,
-      commentRepository: mockCommentRepository,
-      replyRepository: {},
-    });
-
-    // Action & Assert
-    /** addReplyUseCase.execute({ thread_id, comment_id, content, owner, date }) */
-    await expect(
-      addReplyUseCase.execute({
-        thread_id: 'threadId', 
-        comment_id: 'invalidCommentId', 
-        content: 'reply',
-        owner: 'owner',
-        date: 'some ISO date'
-      })
-    ).rejects.toThrowError(
-      new NotFoundError('Komentar tidak ditemukan')
-    );
-  });
-
-  it('should throw InvariantError when reply is missing', async () => {
-    // Arrange
-    /** mock required depedencies */
-    const mockThreadRepository = new ThreadRepository();
-    const mockCommentRepository = new CommentRepository();
-
-    const addReplyUseCase = new AddReplyUseCase({
-      threadRepository: mockThreadRepository,
-      commentRepository: mockCommentRepository,
-      replyRepository: {},
-    });
-
-    // Action & Assert
-    /** addReplyUseCase.execute({ thread_id, comment_id, content, owner, date }) */
-    await expect(
-      addReplyUseCase.execute({
-        thread_id: 'thread-123',
-        comment_id: 'comment-123',
-        owner: 'user-123',
-        date: 'some ISO date',
-      })
-    ).rejects.toThrowError(
-      new InvariantError('Tidak ada balasan komentar')
-    );
-  });
-
-  it('should throw InvariantError when reply is not type of string', async () => {
-    // Arrange
-    /** mock required depedencies */
-    const mockThreadRepository = new ThreadRepository();
-    const mockCommentRepository = new CommentRepository();
-
-    const addReplyUseCase = new AddReplyUseCase({
-      threadRepository: mockThreadRepository,
-      commentRepository: mockCommentRepository,
-      replyRepository: {},
-    });
-
-    // Action & Assert
-    /** addReplyUseCase.execute({ thread_id, comment_id, content, owner, date }) */
-    await expect(
-      addReplyUseCase.execute({
-        thread_id: 'thread-123', 
-        comment_id: 'comment-123', 
-        content: {},
-        owner: 'user-123',
-        date: 'some ISO date',
-      })
-    ).rejects.toThrowError(
-      new InvariantError('Tipe data balasan komentar tidak sesuai')
-    );
-  });
-
-  it('should throw InvariantError when reply is an empty string', async () => {
-    // Arrange
-    /** mock required depedencies */
-    const mockThreadRepository = new ThreadRepository();
-    const mockCommentRepository = new CommentRepository();
-
-    const addReplyUseCase = new AddReplyUseCase({
-      threadRepository: mockThreadRepository,
-      commentRepository: mockCommentRepository,
-      replyRepository: {},
-    });
-
-    // Action & Assert
-    /** addReplyUseCase.execute({ thread_id, comment_id, content, owner, date }) */
-    await expect(
-      addReplyUseCase.execute({
-        thread_id: 'thread-123', 
-        comment_id: 'comment-123', 
-        content: '',
-        owner: 'user-123',
-        date: 'some ISO date'
-      })
-    ).rejects.toThrowError(
-      new InvariantError('Balasan komentar tidak boleh kosong')
-    );
-  });
-
   it('should orchestrate reply comment correctly', async () => {
     // Arrange
     const replyTimestamp = new Date().toISOString();
@@ -167,8 +27,8 @@ describe('AddReplyUseCase', () => {
     const mockReplyRepository = new ReplyRepository();
 
     /** mock required depedencies function */
-    mockThreadRepository.isThreadAvailable = jest.fn().mockResolvedValue(true);
-    mockCommentRepository.isCommentAvailableInThread = jest.fn().mockResolvedValue(true);
+    mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue();
+    mockCommentRepository.checkCommentAvailabilityInThread = jest.fn().mockResolvedValue();
     mockReplyRepository.addReply = jest.fn().mockResolvedValue(
       new AddedReply({
         id: 'reply-123',
@@ -201,8 +61,8 @@ describe('AddReplyUseCase', () => {
       owner: 'user-123',
       date: replyTimestamp,
     }));
-    expect(mockThreadRepository.isThreadAvailable).toBeCalledWith('thread-123');
-    expect(mockCommentRepository.isCommentAvailableInThread).toBeCalledWith('comment-123', 'thread-123');
+    expect(mockThreadRepository.checkThreadAvailability).toBeCalledWith('thread-123');
+    expect(mockCommentRepository.checkCommentAvailabilityInThread).toBeCalledWith('comment-123', 'thread-123');
     expect(mockReplyRepository.addReply).toBeCalledWith(expect.objectContaining({
       comment_id: 'comment-123',
       content: 'A critical reply',

@@ -19,14 +19,8 @@ class CommentRepositoryPostgres extends CommentRepository {
   }
 
   _verifyComment(comment) {
-    if (typeof comment === 'undefined') {
-      throw new InvariantError('Tidak dapat menambahkan komentar, karena properti yang dibutuhkan tidak ada');
-    }
-    if (typeof comment !== 'string') {
-      throw new InvariantError('Tidak dapat menambahkan komentar, karena tipe data tidak sesuai');
-    }
     if (comment.length === 0) {
-      throw new InvariantError('Tidak dapat menambahkan komentar, komentar tidak boleh kosong');
+      throw new InvariantError('tidak dapat menambahkan komentar, komentar tidak boleh kosong');
     }
   }
 

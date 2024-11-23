@@ -21,6 +21,10 @@ DomainErrorTranslator._directories = {
   'THREADS.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat thread baru karena tipe data tidak sesuai'),
   'REPLY.NOT_CONTAIN_REQUIRED_PROPERTY': new InvariantError('tidak dapat membuat balasan komentar karena properti yang dibutuhkan tidak ada'),
   'REPLY.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat balasan komentar karena tipe data tidak sesuai'),
+  'NEW_COMMENT.CONTENT_UNDEFINED': new InvariantError('tidak dapat menambahkan komentar karena properti yang dibutuhkan tidak ada'),
+  'NEW_COMMENT.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat menambahkan komentar karena tipe data tidak sesuai'),
+  'REPLY.CONTENT_UNDEFINED': new InvariantError('tidak dapat menambahkan balasan karena properti yang dibutuhkan tidak ada'),
+  'REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat menambahkan balasan karena tipe data tidak sesuai'),
 };
 
 module.exports = DomainErrorTranslator;

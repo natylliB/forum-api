@@ -4,18 +4,19 @@ describe('Reply object { comment_id, content, owner, date }', () => {
   it('should throw error when not contain required property', () => {
     // Arrange
     const payload = {
-      comment_id: 'comment-123',
       owner: 'user-123',
+      content: 'A cool reply',
       date: new Date().toISOString(),
     };
 
     // Action & Assert
     expect(() => new Reply(payload)).toThrowError('REPLY.NOT_CONTAIN_REQUIRED_PROPERTY');
   });
+
   it('should throw error when property not met data type specifications', () => {
     const payload = {
       comment_id: 123,
-      content: 'A Reply',
+      content: 'A cool reply',
       owner: 'user-123',
       date: new Date().toISOString(),
     };
@@ -23,6 +24,32 @@ describe('Reply object { comment_id, content, owner, date }', () => {
     // Action & Assert
     expect(() => new Reply(payload)).toThrowError('REPLY.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
   });
+
+  it('should throw error when reply content is missing', () => {
+    // Arrange
+    const payload = {
+      comment_id: 'comment-123',
+      owner: 'user-123',
+      date: new Date().toISOString(),
+    };
+
+    // Action & Assert
+    expect(() => new Reply(payload)).toThrowError('REPLY.CONTENT_UNDEFINED');
+  });
+
+  it('should throw error when reply content not met data type specification', () => {
+    // Arrange
+    const payload = {
+      comment_id: 'comment-123',
+      content: [''],
+      owner: 'user-123',
+      date: new Date().toISOString(),
+    };
+
+    // Action & Assert 
+    expect(() => new Reply(payload)).toThrowError('REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
+  });
+
   it('should create Reply object correctly', () => {
     // Arrange
     const payload = {

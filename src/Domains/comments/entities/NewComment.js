@@ -12,10 +12,18 @@ class NewComment {
 
   _validatePayload({ thread_id, content, owner, date }) {
     const requiredProperty = [ thread_id, content, owner, date ];
+    if (typeof content === 'undefined') {
+      throw new Error('NEW_COMMENT.CONTENT_UNDEFINED');
+    }
+
+    if (typeof content !== 'string') {
+      throw new Error('NEW_COMMENT.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
+    }
 
     if (requiredProperty.some(prop => typeof prop === 'undefined')) {
       throw new Error('NEW_COMMENT.NOT_CONTAIN_REQUIRED_PROPERTY');
     }
+    
     if (requiredProperty.some(prop => typeof prop !== 'string')) {
       throw new Error('NEW_COMMENT.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
     }

@@ -11,9 +11,19 @@ class Reply {
   }
   _verifyPayload({ comment_id, content, owner, date }) {
     const requiredProperties = [ comment_id, content, owner, date ];
+
+    if (typeof content === 'undefined') {
+      throw new Error('REPLY.CONTENT_UNDEFINED');
+    }
+
+    if (typeof content !== 'string') {
+      throw new Error('REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
+    }
+
     if (requiredProperties.some(property => typeof property === 'undefined')) {
       throw new Error('REPLY.NOT_CONTAIN_REQUIRED_PROPERTY');
     }
+    
     if (requiredProperties.some(property => typeof property !== 'string')) {
       throw new Error('REPLY.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
     }
