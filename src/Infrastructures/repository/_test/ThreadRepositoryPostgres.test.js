@@ -2,7 +2,7 @@ const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const pool = require('../../database/postgres/pool');
-const Thread = require('../../../Domains/threads/entities/Thread');
+const NewThread = require('../../../Domains/threads/entities/NewThread');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
 const CommentTableTestHelper = require('../../../../tests/CommentTableTestHelper');
 const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
@@ -26,7 +26,7 @@ describe('ThreadRepositoryPostgres', () => {
   describe('addThread function', () => {
     it('should persist thread and return addedThread correctly', async () => {
       // Arrange
-      const thread = new Thread({
+      const thread = new NewThread({
         title: 'Some Title',
         body: 'Some Content',
         owner: 'user-123',

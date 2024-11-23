@@ -1,9 +1,9 @@
 const AddThreadUseCase = require('../AddThreadUseCase');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
-const Thread = require('../../../Domains/threads/entities/Thread');
+const NewThread = require('../../../Domains/threads/entities/NewThread');
 
-jest.mock('../../../Domains/threads/entities/Thread');
+jest.mock('../../../Domains/threads/entities/NewThread');
 
 describe('AddThreadUseCase', () => {
   it('should orchestrate the add thead process correctly', async () => {
@@ -17,7 +17,7 @@ describe('AddThreadUseCase', () => {
     };
     
     // mock thread constructor behavior
-    Thread.mockImplementation((payload) => ({
+    NewThread.mockImplementation((payload) => ({
       title: payload.title,
       body: payload.body,
       owner: payload.owner,
@@ -42,7 +42,7 @@ describe('AddThreadUseCase', () => {
     const addedThread = await addThreadUseCase.execute(payload);
 
     // Assert
-    expect(Thread).toBeCalledWith(expect.objectContaining({
+    expect(NewThread).toBeCalledWith(expect.objectContaining({
       title: 'Some Topic',
       body: 'Some Content',
       owner: 'user-123',

@@ -1,4 +1,4 @@
-class Thread {
+class NewThread {
   constructor(payload) {
     this._validatePayload(payload);
 
@@ -14,13 +14,13 @@ class Thread {
     const requiredProperties = [ title, body, owner, date ];
 
     if (requiredProperties.some(property => typeof property === 'undefined')) {
-      throw new Error('THREADS.NOT_CONTAIN_REQUIRED_PROPERTY');
+      throw new Error('NEW_THREAD.NOT_CONTAIN_REQUIRED_PROPERTY');
     }
 
     if (requiredProperties.some(property => typeof property !== 'string')) {
-      throw new Error('THREADS.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
+      throw new Error('NEW_THREAD.PROPERTY_NOT_MET_DATA_TYPE_SPECIFICATION');
     }
   }
 }
 
-module.exports = Thread;
+module.exports = NewThread;
