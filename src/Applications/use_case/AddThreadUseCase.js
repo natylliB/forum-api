@@ -1,4 +1,3 @@
-const AddedThread = require('../../Domains/threads/entities/AddedThread');
 const Thread = require('../../Domains/threads/entities/Thread');
 
 class AddThreadUseCase {
