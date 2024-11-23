@@ -1,16 +1,10 @@
-const NotFoundError = require("../../Commons/exceptions/NotFoundError");
-
 class GetThreadDetailUseCase {
   constructor({ threadRepository }) {
     this._threadRepository = threadRepository;
   }
 
   async execute(threadId) {
-    const isThreadAvailable = await this._threadRepository.isThreadAvailable(threadId);
-
-    if (!isThreadAvailable) {
-      throw new NotFoundError('Thread tidak ditemukan');
-    }
+    await this._threadRepository.checkThreadAvailability(threadId);
 
     const thread = await this._threadRepository.getThreadDetail(threadId);
 

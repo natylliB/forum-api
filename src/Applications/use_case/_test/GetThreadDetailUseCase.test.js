@@ -3,26 +3,13 @@ const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
 
 describe('GetThreadDetailUseCase', () => {
-  it('should throw NotFoundError when the thread is not found', async () => {
-    // Arrange
-    /** mock required depedencies */
-    const mockThreadRepository = new ThreadRepository();
-
-    /** mock required depedencies functions */
-    mockThreadRepository.isThreadAvailable = jest.fn().mockResolvedValue(false);
-
-    const getThreadDetailUseCase = new GetThreadDetailUseCase({ threadRepository: mockThreadRepository });
-
-    // Action & Assert
-    await expect(getThreadDetailUseCase.execute('')).rejects.toThrowError(NotFoundError);
-  });
   it('should orchestrate getting thread detail correctly', async () => {
     // Arrange
     /** mock required depedencies */
     const mockThreadRepository = new ThreadRepository();
 
     /** mock required depedencies functions */
-    mockThreadRepository.isThreadAvailable = jest.fn().mockResolvedValue(true);
+    mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue(true);
     mockThreadRepository.getThreadDetail = jest.fn().mockResolvedValue({
       id: 'thread-123',
       title: 'sebuah thread',
@@ -51,7 +38,7 @@ describe('GetThreadDetailUseCase', () => {
     const threadDetail = await getThreadDetailUseCase.execute('thread-123');
 
     // Assert
-    expect(mockThreadRepository.isThreadAvailable).toBeCalledWith('thread-123');
+    expect(mockThreadRepository.checkThreadAvailability).toBeCalledWith('thread-123');
     expect(mockThreadRepository.getThreadDetail).toBeCalledWith('thread-123');
     expect(threadDetail).toEqual(expect.objectContaining({
       id: 'thread-123',
