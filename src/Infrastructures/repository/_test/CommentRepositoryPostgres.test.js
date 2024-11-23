@@ -166,9 +166,6 @@ describe('CommentRepositoryPostgres', () => {
 
       const commentsThen = await CommentTableTestHelper.findCommentById('comment-123');
       expect(commentsThen).toHaveLength(1);
-      
-      /** is_delete column before delete comment */
-      const deleteStatusBeforeCommentDelete = commentsThen[0].is_delete;
 
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
       
@@ -179,7 +176,7 @@ describe('CommentRepositoryPostgres', () => {
 
       const commentsNow = await CommentTableTestHelper.findCommentById('comment-123');
       expect(commentsNow).toHaveLength(1);
-      expect(commentsNow[0].is_delete).not.toEqual(deleteStatusBeforeCommentDelete);
+      expect(commentsNow[0].is_delete).not.toEqual(false);
     })
   })
 });
