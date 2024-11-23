@@ -123,6 +123,7 @@ describe('/coments endpoint', () => {
       expect(responseJson.status).toEqual('fail');
       expect(responseJson.message).toEqual('Thread tidak ditemukan');
     });
+
     it('should response 400 when request body is invalid', async () => {
       // Arrange
       const requestPayload = { unkown: 'Some unknown things' };
@@ -142,7 +143,51 @@ describe('/coments endpoint', () => {
       const responseJson = JSON.parse(response.payload);
       expect(response.statusCode).toEqual(400);
       expect(responseJson.status).toEqual('fail');
-      expect(responseJson.message).toBeDefined();
+      expect(responseJson.message).toEqual('Tidak dapat menambahkan komentar, karena properti yang dibutuhkan tidak ada');
+    });
+
+    it('should response 400 when request body not met data type specification', async () => {
+      // Arrange
+      const requestPayload = { content: [''] };
+
+      // Action
+      /** Jack try comment with wrong request payload */
+      const response = await server.inject({
+        method: 'POST',
+        url: `/threads/${addedThreadId}/comments`,
+        payload: requestPayload,
+        headers: {
+          authorization: `Bearer ${jackAccessToken}`,
+        },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(400);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('Tidak dapat menambahkan komentar, karena tipe data tidak sesuai');
+    });
+
+    it('should response 400 when request body comment is empty', async () => {
+      // Arrange
+      const requestPayload = { content: '' };
+
+      // Action
+      /** Jack try comment with wrong request payload */
+      const response = await server.inject({
+        method: 'POST',
+        url: `/threads/${addedThreadId}/comments`,
+        payload: requestPayload,
+        headers: {
+          authorization: `Bearer ${jackAccessToken}`,
+        },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(400);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('Tidak dapat menambahkan komentar, komentar tidak boleh kosong');
     });
 
     it('should response 201 with addedComment', async () => {
@@ -302,7 +347,7 @@ describe('/coments endpoint', () => {
       const responseJson = JSON.parse(response.payload);
       expect(response.statusCode).toEqual(404);
       expect(responseJson.status).toEqual('fail');
-      expect(responseJson.message).toEqual('Comment tidak ditemukan');
+      expect(responseJson.message).toEqual('Komentar tidak ditemukan');
     });
   });
 });

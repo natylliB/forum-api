@@ -2,6 +2,7 @@ const AddedComment = require('../../Domains/comments/entities/AddedComment');
 const CommentRepository = require('../../Domains/comments/CommentRepository');
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 const InvariantError = require('../../Commons/exceptions/InvariantError');
+const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 
 class CommentRepositoryPostgres extends CommentRepository {
   constructor(pool, idGenerator) {
@@ -12,7 +13,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     this._verifyComment = this._verifyComment.bind(this);
     this.addComment = this.addComment.bind(this);
-    this.isCommentAvailableInThread = this.isCommentAvailableInThread.bind(this);
+    this.isCommentAvailableInThread = this.checkCommentAvailabilityInThread.bind(this);
     this.checkCommentOwnership = this.checkCommentOwnership.bind(this);
     this.deleteComment = this.deleteComment.bind(this);
   }
@@ -41,14 +42,16 @@ class CommentRepositoryPostgres extends CommentRepository {
     return new AddedComment({ ...result.rows[0] });
   }
 
-  async isCommentAvailableInThread(commentId, threadId) {
+  async checkCommentAvailabilityInThread(commentId, threadId) {
     const query = {
       text: 'SELECT EXISTS(SELECT 1 FROM comments WHERE id = $1 AND thread_id = $2)',
       values: [commentId, threadId],
     };
 
     const result = await this._pool.query(query);
-    return result.rows[0].exists;
+    if (!result.rows[0].exists) {
+      throw new NotFoundError('Komentar tidak ditemukan')
+    }
   }
 
   async checkCommentOwnership(commentId, userId) {

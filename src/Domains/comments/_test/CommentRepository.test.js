@@ -5,7 +5,7 @@ describe('CommentRepository interface', () => {
     const commentRepository = new CommentRepository();
     
     await expect(commentRepository.addComment({})).rejects.toThrowError('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
-    await expect(commentRepository.isCommentAvailableInThread('', '')).rejects.toThrowError('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    await expect(commentRepository.checkCommentAvailabilityInThread('', '')).rejects.toThrowError('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     await expect(commentRepository.checkCommentOwnership('', '')).rejects.toThrowError('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     await expect(commentRepository.deleteComment('')).rejects.toThrowError('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   });

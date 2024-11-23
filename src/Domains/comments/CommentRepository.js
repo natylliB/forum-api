@@ -3,7 +3,7 @@ class CommentRepository {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
-  async isCommentAvailableInThread(id, threadId) {
+  async checkCommentAvailabilityInThread(id, threadId) {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
   

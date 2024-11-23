@@ -7,6 +7,7 @@ const NewComment = require('../../../Domains/comments/entities/NewComment');
 const AddedComment = require('../../../Domains/comments/entities/AddedComment');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 const InvariantError = require('../../../Commons/exceptions/InvariantError');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('CommentRepositoryPostgres', () => {
   beforeAll(async () => {
@@ -108,8 +109,8 @@ describe('CommentRepositoryPostgres', () => {
     });
   });
 
-  describe('isCommentAvailableInThread function', () => {
-    it('should resolve false when comment is not in the given thread', async () => {
+  describe('checkCommentAvailabilityInThread function', () => {
+    it('should throw NotFoundError when comment is not in the given thread', async () => {
       // Arrange
       const payload = new NewComment({
         thread_id: 'thread-123',
@@ -126,10 +127,12 @@ describe('CommentRepositoryPostgres', () => {
       // Action & Assert 
       /** the only comment available in thread-123 right now is comment-123 */
       await expect(
-        commentRepositoryPostgres.isCommentAvailableInThread('comment-456', 'thread-123')
-      ).resolves.toEqual(false);
+        commentRepositoryPostgres.checkCommentAvailabilityInThread('comment-456', 'thread-123')
+      ).rejects.toThrowError(
+        new NotFoundError('Komentar tidak ditemukan')
+      );
     });
-    it('should resolve true when comment is in the given thread', async () => {
+    it('should resolve when comment is in the given thread', async () => {
       // Arrange
       const payload = new NewComment({
         thread_id: 'thread-123',
@@ -145,8 +148,8 @@ describe('CommentRepositoryPostgres', () => {
 
       // Action & Assert
       await expect(
-        commentRepositoryPostgres.isCommentAvailableInThread(addedComment.id, 'thread-123')
-      ).resolves.toEqual(true);
+        commentRepositoryPostgres.checkCommentAvailabilityInThread(addedComment.id, 'thread-123')
+      ).resolves.not.toThrowError(new NotFoundError('Komentar tidak ditemukan'));
     });
   });
 
