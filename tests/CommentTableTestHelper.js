@@ -33,7 +33,7 @@ const CommentTableTestHelper = {
       };
 
       const result = await pool.query(query);
-      return result.rows[0].date.toISOString();
+      return result.rows[0].date;
   },
   async deleteComment(commentId) {
     const query = {

@@ -20,7 +20,7 @@ const RepliesTableTestHelper = {
 
     const result = await pool.query(query);
 
-    return result.rows[0].date.toISOString();
+    return result.rows[0].date;
   },
   async deleteReply(id) {
     const query = {
