@@ -15,14 +15,14 @@ describe('ReplyRepositoryPostgres', () => {
     // create user
     await UsersTableTestHelper.addUser({ id: 'user-123', username: 'billy' });
     await UsersTableTestHelper.addUser({ id: 'user-456', username: 'jack' });
-    // billy (user-123) create thread
+    // billy (user-123) create (thread-123)
     await ThreadsTableTestHelper.addThread({ 
       id: 'thread-123', 
       title: 'Some interesting topic', 
       body: 'Some engaging content',
       owner: 'user-123',
     });
-    // jack (user-456) create comment
+    // jack (user-456) create (comment-123)
     await CommentTableTestHelper.addComment({
       id: 'comment-123',
       thread_id: 'thread-123',
@@ -135,7 +135,7 @@ describe('ReplyRepositoryPostgres', () => {
 
   describe('checkReplyOwnership function', () => {
     beforeEach(async () => {
-      // Add Reply form billy (user-123)
+      // Add (reply-123) form billy (user-123)
       await RepliesTableTestHelper.addReply({
         id: 'reply-123',
         comment_id: 'comment-123',
@@ -174,7 +174,7 @@ describe('ReplyRepositoryPostgres', () => {
 
   describe('deleteReply function', () => {
     beforeEach(async () => {
-      // Add Reply form billy (user-123)
+      // Add (reply-123) form billy (user-123)
       await RepliesTableTestHelper.addReply({
         id: 'reply-123',
         comment_id: 'comment-123',
@@ -198,4 +198,90 @@ describe('ReplyRepositoryPostgres', () => {
       expect(replies[0].is_delete).toEqual(true);
     });
   });
+
+  describe('getRepliesByCommentIds(...commentIds) function', () => {
+    let jackReplyTimestamp = '';
+    let billyReplyTimestamp = '';
+    let jackSecondReplyTimestamp = '';
+
+    beforeEach(async () => {
+      /**
+       * we have users billy(user-123) jack(user-456)
+       * we have a thread (thread-123) by billy
+       * we have a comment (comment-123) in (thread-123) by jack
+       */
+
+      // Create a comment(comment-124) in (thread-123) by billy
+      await CommentTableTestHelper.addComment({
+        id: 'comment-124',
+        thread_id: 'thread-123',
+        content: 'Thread saya tutup ya!',
+        owner: 'user-123'
+      });
+
+      // jack reply (reply-123) to (comment-123)
+      jackReplyTimestamp = await RepliesTableTestHelper.addReply({
+        id: 'reply-123',
+        comment_id: 'comment-123',
+        content: 'A critical reply',
+        owner: 'user-456',
+      });
+
+      // billy reply(reply-124) to (comment-123)
+      billyReplyTimestamp = await RepliesTableTestHelper.addReply({
+        id: 'reply-124',
+        comment_id: 'comment-123',
+        content: 'A debateful reply',
+        owner: 'user-123',
+      });
+
+      // jack reply(reply-125) to (comment-123)
+      jackSecondReplyTimestamp = await RepliesTableTestHelper.addReply({
+        id: 'reply-125',
+        comment_id: 'comment-123',
+        content: 'A sensitive reply',
+        owner: 'user-456',
+      });
+
+      // delete (reply-125)
+      await RepliesTableTestHelper.deleteReply('reply-125');
+    });
+
+    it('should return the replies of all commentsIds provided', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+      const arrayOfCommentIds = ['comment-123', 'comment-124'];
+
+      // Action
+      const repliesOfComments = await replyRepositoryPostgres.getRepliesByCommentIds(...arrayOfCommentIds);
+
+      // Assert
+      expect(repliesOfComments).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          id: 'reply-123',
+          comment_id: 'comment-123',
+          content: 'A critical reply',
+          date: jackReplyTimestamp,
+          username: 'jack',
+          is_delete: false,
+        }),
+        expect.objectContaining({
+          id: 'reply-124',
+          comment_id: 'comment-123',
+          content: 'A debateful reply',
+          date: billyReplyTimestamp,
+          username: 'billy',
+          is_delete: false,
+        }),
+        expect.objectContaining({
+          id: 'reply-125',
+          comment_id: 'comment-123',
+          content: 'A sensitive reply',
+          date: jackSecondReplyTimestamp,
+          username: 'jack',
+          is_delete: true,
+        }),
+      ]));
+    });
+  })
 });

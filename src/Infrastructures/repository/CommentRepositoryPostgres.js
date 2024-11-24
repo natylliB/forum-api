@@ -13,7 +13,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     this._verifyComment = this._verifyComment.bind(this);
     this.addComment = this.addComment.bind(this);
-    this.isCommentAvailableInThread = this.checkCommentAvailabilityInThread.bind(this);
+    this.checkCommentAvailabilityInThread = this.checkCommentAvailabilityInThread.bind(this);
     this.checkCommentOwnership = this.checkCommentOwnership.bind(this);
     this.deleteComment = this.deleteComment.bind(this);
   }
@@ -72,6 +72,30 @@ class CommentRepositoryPostgres extends CommentRepository {
     };
 
     await this._pool.query(query);
+  }
+
+  async getCommentsByThreadId(threadId) {
+    const query = {
+      text: `
+        SELECT 
+          c.id,
+          c.thread_id,
+          c.content,
+          cu.username,
+          c.date,
+          c.is_delete
+        FROM 
+          comments c
+        LEFT JOIN
+          users cu ON c.owner = cu.id
+        WHERE
+          c.thread_id = $1
+      `,
+      values: [threadId],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 }
 

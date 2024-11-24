@@ -9,6 +9,10 @@ const Comment = require('../Comment');
 //   is_delete: false,
 // }
 
+jest.mock('../../../replies/entities/Reply', () => {
+  return jest.fn();
+});
+
 describe('Comment { id, content, username, date, is_delete } object', () => {
   it('should throw error when missing required property', () => {
     // Arrange
@@ -89,27 +93,19 @@ describe('Comment { id, content, username, date, is_delete } object', () => {
       const comment = new Comment(payload);
       expect(comment.replies).toHaveLength(0);
 
+      Reply.mockImplementation(function Reply(payload) {
+        this.id = payload.id;
+      })
+
       const replies = [
         new Reply({
           id: 'reply-124',
-          content: 'A debateful reply',
-          date: new Date('2024-11-24T04:41:10.982Z'),
-          username: 'billy',
-          is_delete: false,
         }),
         new Reply({
           id: 'reply-123',
-          content: 'A critical reply',
-          date: new Date('2024-11-24T04:01:23.335Z'),
-          username: 'jack',
-          is_delete: false
         }),
         new Reply({
           id: 'reply-125',
-          content: 'Sebuah Komentar',
-          date: new Date('2024-11-24T04:41:33.711Z'),
-          username: 'jack',
-          is_delete: true
         }),
       ];
 
@@ -129,6 +125,8 @@ describe('Comment { id, content, username, date, is_delete } object', () => {
         date: new Date(),
         is_delete: false,
       };
+
+      Reply.mockImplementation(function Reply(){});
 
       const comment = new Comment(payload);
 
@@ -158,29 +156,21 @@ describe('Comment { id, content, username, date, is_delete } object', () => {
         is_delete: false,
       };
 
+      Reply.mockImplementation(function Reply(payload){
+        this.date = payload.date;
+      });
+
       const comment = new Comment(payload);
 
       const replies = [
         new Reply({
-          id: 'reply-124',
-          content: 'A debateful reply',
-          date: new Date('2024-11-24T04:41:10.982Z'), // order: 2
-          username: 'billy',
-          is_delete: false,
+          date: '2024-11-24T04:41:10.982Z', // order: 2
         }),
         new Reply({
-          id: 'reply-123',
-          content: 'A critical reply',
-          date: new Date('2024-11-24T04:01:23.335Z'), // order: 1
-          username: 'jack',
-          is_delete: false
+          date: '2024-11-24T04:01:23.335Z', // order: 1
         }),
         new Reply({
-          id: 'reply-125',
-          content: 'Sebuah Komentar',
-          date: new Date('2024-11-24T04:41:33.711Z'), // order: 3
-          username: 'jack',
-          is_delete: true
+          date: '2024-11-24T04:41:33.711Z', // order: 3
         }),
       ];
       
@@ -190,22 +180,13 @@ describe('Comment { id, content, username, date, is_delete } object', () => {
       // Assert
       expect(comment.replies).toEqual([
         {
-          id: 'reply-123',
-          content: 'A critical reply',
           date: '2024-11-24T04:01:23.335Z',
-          username: 'jack',
         },
         {
-          id: 'reply-124',
-          content: 'A debateful reply',
           date: '2024-11-24T04:41:10.982Z',
-          username: 'billy',
         },
         {
-          id: 'reply-125',
-          content: '**balasan telah dihapus**',
           date: '2024-11-24T04:41:33.711Z',
-          username: 'jack',
         },
       ]);
     });

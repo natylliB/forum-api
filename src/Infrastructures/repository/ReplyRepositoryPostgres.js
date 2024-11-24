@@ -12,8 +12,10 @@ class ReplyRepositoryPostgres extends ReplyRepository {
 
     this._verifiyReply = this._verifiyReply.bind(this);
     this.addReply = this.addReply.bind(this);
-    this.isReplyAvailableInComment = this.checkReplyAvailabilityInComment.bind(this);
-    this.isReplyOwnerValid = this.checkReplyOwnership.bind(this);
+    this.checkReplyAvailabilityInComment = this.checkReplyAvailabilityInComment.bind(this);
+    this.checkReplyOwnership = this.checkReplyOwnership.bind(this);
+    this.deleteReply = this.deleteReply.bind(this);
+    this.getRepliesByCommentIds = this.getRepliesByCommentIds.bind(this);
   }
 
   _verifiyReply(reply) {
@@ -68,6 +70,36 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     };
 
     await this._pool.query(query);
+  }
+
+  async getRepliesByCommentIds(...commentIds) {
+    if (commentIds.length === 0) {
+      return [];
+    }
+
+    const placeholder = commentIds.map((_, index) => `$${index + 1}`).join(', ');
+
+    const query = {
+      text: `
+        SELECT
+          r.id AS id,
+          r.comment_id AS comment_id,
+          r.content AS content,
+          r.date AS date,
+          ru.username AS username,
+          r.is_delete AS is_delete  
+        FROM
+          replies r
+        LEFT JOIN
+          users ru ON r.owner = ru.id
+        WHERE
+          r.comment_id IN (${placeholder})
+      `,
+      values: commentIds
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 }
 

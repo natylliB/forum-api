@@ -127,4 +127,52 @@ describe('GetThreadDetailUseCase', () => {
       ],
     }, null, 2));
   });
+
+  it('should orchestrate getting thread detail correctly for thread without comment', async () => {
+    // Arrange
+    /** mock required depedencies */
+    const mockThreadRepository = new ThreadRepository();
+    const mockCommentRepository = new CommentRepository();
+    const mockReplyRepository = new ReplyRepository();
+
+    /** mock required depedencies functions */
+    mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue(true);
+
+    mockThreadRepository.getThreadDetail = jest.fn().mockResolvedValue({
+      id: 'thread-123',
+      title: 'sebuah thread',
+      body: 'sebuah body thread',
+      username: 'billy',
+      date: new Date('2021-08-08T07:19:09.775Z'),
+    });
+
+    mockCommentRepository.getCommentsByThreadId = jest.fn().mockResolvedValue([]); // no comment
+
+    mockReplyRepository.getRepliesByCommentIds = jest.fn().mockResolvedValue([]); // thus no reply
+
+    
+    const getThreadDetailUseCase = new GetThreadDetailUseCase({
+      threadRepository: mockThreadRepository,
+      commentRepository: mockCommentRepository,
+      replyRepository: mockReplyRepository,
+    });
+    
+    // Action
+    const threadDetail = await getThreadDetailUseCase.execute('thread-123');
+
+    // Assert
+    expect(mockThreadRepository.checkThreadAvailability).toBeCalledWith('thread-123');
+    expect(mockThreadRepository.getThreadDetail).toBeCalledWith('thread-123');
+    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith('thread-123');
+    expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith();
+
+    expect(JSON.stringify(threadDetail, null, 2)).toEqual(JSON.stringify({
+      id: 'thread-123',
+      title: 'sebuah thread',
+      body: 'sebuah body thread',
+      date: '2021-08-08T07:19:09.775Z',
+      username: 'billy',
+      comments: [],
+    }, null, 2));
+  })
 });

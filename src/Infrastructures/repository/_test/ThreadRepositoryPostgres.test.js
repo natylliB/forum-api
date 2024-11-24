@@ -4,8 +4,6 @@ const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const pool = require('../../database/postgres/pool');
 const NewThread = require('../../../Domains/threads/entities/NewThread');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
-const CommentTableTestHelper = require('../../../../tests/CommentTableTestHelper');
-const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('ThreadRepositoryPostgres', () => {
@@ -76,52 +74,13 @@ describe('ThreadRepositoryPostgres', () => {
   describe('getThreadDetail function', () => {
     it('should get the thread detail correctly', async () => {
       // Arrange
-      /** create another user */
-      await UsersTableTestHelper.addUser({ id: 'user-124', username: 'jack' });
-      
       //** create a thread */
       const billyThreadTimestamp = await ThreadsTableTestHelper.addThread({
         id: 'thread-123',
-        owner: 'user-123' 
-      }); // other default values. title: Some Interesting Topic, body: Some Engaging Content
-      
-      /** comment on thread-123 by jack (user-124) */
-      const jackCommentTimeStamp = await CommentTableTestHelper.addComment({
-        id: 'comment-123',
-        thread_id: 'thread-123',
-        content: 'Interesting insights',
-        owner: 'user-124',
-      });
-
-      /** comment on thread-123 by billy (user-123) */
-      const billyCommentTimestamp = await CommentTableTestHelper.addComment({
-        id: 'comment-124',
-        thread_id: 'thread-123',
-        content: 'Something sensitive',
         owner: 'user-123',
+        title: 'sebuah thread',
+        body: 'sebuah body thread',
       });
-
-      /** delete comment-124 */
-      await CommentTableTestHelper.deleteComment('comment-124');
-
-      /** reply to comment-123 by billy (user-123) */
-      const billyReplyTimestamp  = await RepliesTableTestHelper.addReply({
-        id: 'reply-123',
-        comment_id: 'comment-123',
-        content: 'Thank You!',
-        owner: 'user-123',
-      });
-
-      /** reply to comment 123 by jack (user-124) */
-      const jackReplyTimestamp = await RepliesTableTestHelper.addReply({
-        id: 'reply-124',
-        comment_id: 'comment-123',
-        content: 'Some crude joke',
-        owner: 'user-124',
-      })
-
-      /** jack (user-124) delete his own reply (reply-124)  */
-      await RepliesTableTestHelper.deleteReply('reply-124');
 
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
@@ -131,39 +90,10 @@ describe('ThreadRepositoryPostgres', () => {
       // Assert
       expect(thread).toEqual(expect.objectContaining({
         id: 'thread-123',
-        title: 'Some Interesting Topic',
-        body: 'Some Engaging Content',
-        date: billyThreadTimestamp,
+        title: 'sebuah thread',
+        body: 'sebuah body thread',
         username: 'billy',
-        comments: [
-          {
-            id: 'comment-123',
-            username: 'jack',
-            date: jackCommentTimeStamp,
-            replies: [
-              {
-                id: 'reply-123',
-                content: 'Thank You!',
-                date: billyReplyTimestamp,
-                username: 'billy',
-              },
-              {
-                id: 'reply-124',
-                content: '**balasan telah dihapus**',
-                date: jackReplyTimestamp,
-                username: 'jack'
-              }
-            ],
-            content: 'Interesting insights',
-          },
-          {
-            id: 'comment-124',
-            username: 'billy',
-            date: billyCommentTimestamp,
-            replies: [],
-            content: '**komentar telah dihapus**',
-          },
-        ],
+        date: billyThreadTimestamp,
       }));
     });
   });

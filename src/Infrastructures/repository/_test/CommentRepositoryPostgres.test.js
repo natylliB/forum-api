@@ -178,5 +178,68 @@ describe('CommentRepositoryPostgres', () => {
       expect(commentsNow).toHaveLength(1);
       expect(commentsNow[0].is_delete).not.toEqual(false);
     })
+  });
+
+  describe('getCommentByThreadIds function', () => {
+    let jackCommentTimestamp = '';
+    let billyCommentTimestamp = '';
+    beforeAll(async () => {
+      /** we have thread-123 by billy (user-123) */
+      // creating new user jack (user-124)
+      await UserTableTestHelper.addUser({ 
+        id: 'user-124',
+        username: 'jack',
+        fullname: 'Jack Sparrow',
+      });
+
+      // creating comment-123 by jack (user-124) to billy thread
+      jackCommentTimestamp = await CommentTableTestHelper.addComment({ 
+        id: 'comment-123',
+        content: 'sebuah comment',
+        thread_id: 'thread-123',
+        owner: 'user-124',
+        date: '2021-08-08T07:22:33.555Z'
+      });
+
+      // creating comment-124 by billy
+      billyCommentTimestamp = await CommentTableTestHelper.addComment({
+        id: 'comment-124',
+        content: 'sebuah komentar menarik',
+        thread_id: 'thread-123',
+        owner: 'user-123',
+        date: '2021-08-08T07:26:21.338Z',
+      });
+
+      // billy delete his own comment
+      await CommentTableTestHelper.deleteComment('comment-124');
+    });
+    
+    it('should return comments of the threadId provided', async () => {
+      // Arrange
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action
+      const comments = await commentRepositoryPostgres.getCommentsByThreadId('thread-123');
+
+      // Assert
+      expect(comments).toEqual([
+        {
+          id: 'comment-123',
+          thread_id: 'thread-123', 
+          content: 'sebuah comment',
+          username: 'jack',
+          date: jackCommentTimestamp,
+          is_delete: false,
+        },
+        {
+          id: 'comment-124',
+          thread_id: 'thread-123',
+          content: 'sebuah komentar menarik',
+          username: 'billy',
+          date: billyCommentTimestamp,
+          is_delete: true,
+        },
+      ])
+    })
   })
 });
