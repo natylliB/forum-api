@@ -7,10 +7,10 @@ class Comment {
     const { id, content, is_delete, username, date } = payload;
 
     this.id = id;
-    this.content = is_delete ? '**komentar telah dihapus**' : content;
     this.username = username;
-    this.date = date;
+    this.date = date.toISOString();
     this.replies = [];
+    this.content = is_delete ? '**komentar telah dihapus**' : content;
   }
 
   setReplies(val) {

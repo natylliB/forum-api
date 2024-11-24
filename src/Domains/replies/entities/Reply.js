@@ -6,7 +6,7 @@ class Reply {
 
     this.id = id;
     this.content = is_delete ? '**balasan telah dihapus**' : content;
-    this.date = date;
+    this.date = date.toISOString();
     this.username = username;
   }
 

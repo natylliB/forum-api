@@ -70,7 +70,7 @@ describe('Comment { id, content, username, date, is_delete } object', () => {
     // Assert
     expect(id).toEqual(payload.id);
     expect(username).toEqual(payload.username);
-    expect(date).toEqual(payload.date);
+    expect(date).toEqual(payload.date.toISOString());
     expect(replies).toEqual([]);
     expect(content).toEqual(payload.content);
   });
@@ -192,19 +192,19 @@ describe('Comment { id, content, username, date, is_delete } object', () => {
         {
           id: 'reply-123',
           content: 'A critical reply',
-          date: new Date('2024-11-24T04:01:23.335Z'),
+          date: '2024-11-24T04:01:23.335Z',
           username: 'jack',
         },
         {
           id: 'reply-124',
           content: 'A debateful reply',
-          date: new Date('2024-11-24T04:41:10.982Z'),
+          date: '2024-11-24T04:41:10.982Z',
           username: 'billy',
         },
         {
           id: 'reply-125',
           content: '**balasan telah dihapus**',
-          date: new Date('2024-11-24T04:41:33.711Z'),
+          date: '2024-11-24T04:41:33.711Z',
           username: 'jack',
         },
       ]);

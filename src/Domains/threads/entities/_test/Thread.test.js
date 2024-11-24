@@ -54,7 +54,7 @@ describe('Thread { id, title, body, date, username } object', () => {
     expect(id).toEqual(payload.id);
     expect(title).toEqual(payload.title);
     expect(body).toEqual(payload.body);
-    expect(date).toEqual(payload.date);
+    expect(date).toEqual(payload.date.toISOString());
     expect(username).toEqual(payload.username);
     expect(comments).toEqual([]);
   });
@@ -125,14 +125,14 @@ describe('Thread { id, title, body, date, username } object', () => {
           {
             id: 'comment-123', 
             username: 'jack',
-            date: new Date('2021-08-08T07:22:33.555Z'),
+            date: '2021-08-08T07:22:33.555Z',
             replies: [],
             content: 'sebuah comment',
           },
           {
             id: 'comment-124',
             username: 'billy',
-            date: new Date('2021-08-08T07:26:21.338Z'),
+            date: '2021-08-08T07:26:21.338Z',
             replies: [],
             content: '**komentar telah dihapus**',
           },

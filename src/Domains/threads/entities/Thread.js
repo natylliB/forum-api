@@ -9,7 +9,7 @@ class Thread {
     this.id = id;
     this.title = title;
     this.body = body;
-    this.date = date;
+    this.date = date.toISOString();
     this.username = username;
     this.comments = [];
   }

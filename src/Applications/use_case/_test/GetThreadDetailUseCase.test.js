@@ -19,7 +19,7 @@ describe('GetThreadDetailUseCase', () => {
       title: 'sebuah thread',
       body: 'sebuah body thread',
       username: 'billy',
-      date: '2021-08-08T07:19:09.775Z',
+      date: new Date('2021-08-08T07:19:09.775Z'),
     });
 
     mockCommentRepository.getCommentsByThreadId = jest.fn().mockResolvedValue([
@@ -28,7 +28,7 @@ describe('GetThreadDetailUseCase', () => {
         thread_id: 'thread-123', 
         content: 'sebuah comment',
         username: 'jack',
-        date: '2021-08-08T07:22:33.555Z',
+        date: new Date('2021-08-08T07:22:33.555Z'),
         is_delete: false,
       },
       {
@@ -36,38 +36,36 @@ describe('GetThreadDetailUseCase', () => {
         thread_id: 'thread-123',
         content: 'sebuah komentar menarik',
         username: 'billy',
-        date: '2021-08-08T07:26:21.338Z',
+        date: new Date('2021-08-08T07:26:21.338Z'),
         is_delete: true,
       },
     ]);
 
     mockReplyRepository.getRepliesByCommentIds = jest.fn().mockResolvedValue([
-      [ 
-        {
-          id: 'reply-123',
-          comment_id: 'comment-123',
-          content: 'A critical reply',
-          date: '2024-11-24T04:01:23.335Z',
-          username: 'jack',
-          is_delete: false,
-        },
-        {
-          id: 'reply-124',
-          comment_id: 'comment-123',
-          content: 'A debateful reply',
-          date: '2024-11-24T04:41:10.982Z',
-          username: 'billy',
-          is_delete: false,
-        },
-        {
-          id: 'reply-125',
-          comment_id: 'comment-123',
-          content: 'A sensitive reply',
-          date: '2024-11-24T04:41:33.711Z',
-          username: 'jack',
-          is_delete: true,
-        },
-      ],
+      {
+        id: 'reply-123',
+        comment_id: 'comment-123',
+        content: 'A critical reply',
+        date: new Date('2024-11-24T04:01:23.335Z'),
+        username: 'jack',
+        is_delete: false,
+      },
+      {
+        id: 'reply-124',
+        comment_id: 'comment-123',
+        content: 'A debateful reply',
+        date: new Date('2024-11-24T04:41:10.982Z'),
+        username: 'billy',
+        is_delete: false,
+      },
+      {
+        id: 'reply-125',
+        comment_id: 'comment-123',
+        content: 'A sensitive reply',
+        date: new Date('2024-11-24T04:41:33.711Z'),
+        username: 'jack',
+        is_delete: true,
+      },
     ]);
 
     
@@ -86,7 +84,7 @@ describe('GetThreadDetailUseCase', () => {
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith('thread-123');
     expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith('comment-123', 'comment-124');
 
-    expect(threadDetail).toEqual(expect.objectContaining({
+    expect(JSON.stringify(threadDetail, null, 2)).toEqual(JSON.stringify({
       id: 'thread-123',
       title: 'sebuah thread',
       body: 'sebuah body thread',
@@ -127,6 +125,6 @@ describe('GetThreadDetailUseCase', () => {
           content: '**komentar telah dihapus**',
         },
       ],
-    }));
+    }, null, 2));
   });
 });

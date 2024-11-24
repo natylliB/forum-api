@@ -69,7 +69,7 @@ describe('Reply {id, content, date, username, is_delete } object', () => {
     // Assert
     expect(id).toEqual(payload.id);
     expect(content).toEqual(payload.content);
-    expect(date).toEqual(payload.date);
+    expect(date).toEqual(payload.date.toISOString());
     expect(username).toEqual(payload.username);
   });
 });
