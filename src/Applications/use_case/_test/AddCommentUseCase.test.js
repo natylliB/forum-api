@@ -30,7 +30,7 @@ describe('AddCommentUseCase', () => {
       })
     );
 
-    mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue(true);
+    mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue();
 
     /** Mock NewComment constructor call */
     NewComment.mockImplementation((payload) => ({

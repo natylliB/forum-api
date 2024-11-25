@@ -12,10 +12,10 @@ describe('DeleteReplyUseCase', () => {
     const mockReplyRepository = new ReplyRepository();
 
     /** mock required depedencies functions */
-    mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue(true);
-    mockCommentRepository.checkCommentAvailabilityInThread = jest.fn().mockResolvedValue(true);
-    mockReplyRepository.checkReplyAvailabilityInComment = jest.fn().mockResolvedValue(true);
-    mockReplyRepository.checkReplyOwnership = jest.fn().mockResolvedValue(true);
+    mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue();
+    mockCommentRepository.checkCommentAvailabilityInThread = jest.fn().mockResolvedValue();
+    mockReplyRepository.checkReplyAvailabilityInComment = jest.fn().mockResolvedValue();
+    mockReplyRepository.checkReplyOwnership = jest.fn().mockResolvedValue();
     mockReplyRepository.deleteReply = jest.fn().mockResolvedValue();
 
     const deleteReplyUseCase = new DeleteReplyUseCase({

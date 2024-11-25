@@ -12,7 +12,7 @@ describe('GetThreadDetailUseCase', () => {
     const mockReplyRepository = new ReplyRepository();
 
     /** mock required depedencies functions */
-    mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue(true);
+    mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue();
 
     mockThreadRepository.getThreadDetail = jest.fn().mockResolvedValue({
       id: 'thread-123',

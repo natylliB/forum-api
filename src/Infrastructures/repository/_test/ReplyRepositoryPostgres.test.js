@@ -204,19 +204,22 @@ describe('ReplyRepositoryPostgres', () => {
     let billyReplyTimestamp = '';
     let jackSecondReplyTimestamp = '';
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       /**
        * we have users billy(user-123) jack(user-456)
        * we have a thread (thread-123) by billy
        * we have a comment (comment-123) in (thread-123) by jack
        */
 
+      const timestamp = new Date().toISOString();
+
       // Create a comment(comment-124) in (thread-123) by billy
       await CommentTableTestHelper.addComment({
         id: 'comment-124',
         thread_id: 'thread-123',
         content: 'Thread saya tutup ya!',
-        owner: 'user-123'
+        owner: 'user-123',
+        date: timestamp,
       });
 
       // jack reply (reply-123) to (comment-123)
@@ -283,5 +286,17 @@ describe('ReplyRepositoryPostgres', () => {
         }),
       ]));
     });
-  })
+
+    it('should return empty array when there is no commentId', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+      const arrayOfCommentIds = []
+
+      // Action
+      const repliesOfComments = await replyRepositoryPostgres.getRepliesByCommentIds(...arrayOfCommentIds);
+
+      // Assert
+      expect(repliesOfComments).toEqual([]);
+    });
+  });
 });

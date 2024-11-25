@@ -84,7 +84,7 @@ describe('Thread { id, title, body, date, username } object', () => {
       expect(() => thread.setComments(comments)).toThrowError('THREAD.COMMENTS_MUST_BE_AN_ARRAY_OF_COMMENT');
     });
 
-    it('should sort comments by date', () => {
+    it('should sort comments ascendingly by date', () => {
       // Arrange
       const payload = {
         id: 'thread-123',

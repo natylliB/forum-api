@@ -121,7 +121,7 @@ describe('CommentRepositoryPostgres', () => {
     it('should reject throw AuthorizationError when user not authorized over the comment', async () => {
       // Arrange
       /** add comment */
-      CommentTableTestHelper.addComment({ 
+      await CommentTableTestHelper.addComment({ 
         id: 'comment-123', 
         thread_id: 'thread-123', 
         owner: 'user-123',
