@@ -1,11 +1,8 @@
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const AddReplyUseCase = require('../AddReplyUseCase');
-const NewReply = require('../../../Domains/replies/entities/NewReply');
 const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
-
-jest.mock('../../../Domains/replies/entities/NewReply');
 
 describe('AddReplyUseCase', () => {
   it('should orchestrate reply comment correctly', async () => {
@@ -35,14 +32,6 @@ describe('AddReplyUseCase', () => {
       })
     );
 
-    /** mock Reply constructor call */
-    NewReply.mockImplementation((payload) => ({
-      comment_id: payload.comment_id,
-      content: payload.content,
-      owner: payload.owner,
-      date: payload.date,
-    }));
-
     const addReplyUseCase = new AddReplyUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
@@ -53,12 +42,6 @@ describe('AddReplyUseCase', () => {
     const addedReply = await addReplyUseCase.execute(useCasePayload);
 
     // Assert
-    expect(NewReply).toBeCalledWith(expect.objectContaining({
-      comment_id: 'comment-123',
-      content: 'A critical reply',
-      owner: 'user-123',
-      date: replyTimestamp,
-    }));
     expect(mockThreadRepository.checkThreadAvailability).toBeCalledWith('thread-123');
     expect(mockCommentRepository.checkCommentAvailabilityInThread).toBeCalledWith('comment-123', 'thread-123');
     expect(mockReplyRepository.addReply).toBeCalledWith(expect.objectContaining({
