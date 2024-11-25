@@ -53,24 +53,6 @@ describe('CommentRepositoryPostgres', () => {
         owner: 'user-123',
       }));
     });
-
-    it('should throw InvariantError when comment is empty', async () => {
-      const payload = new NewComment({
-        thread_id: 'thread-123',
-        content: '',
-        owner: 'user-123',
-        date: new Date().toISOString(),
-      });
-
-      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
-
-      // Action & Assert
-      await expect(
-        commentRepositoryPostgres.addComment(payload)
-      ).rejects.toThrowError(
-        new InvariantError('tidak dapat menambahkan komentar, komentar tidak boleh kosong')
-      );
-    });
   });
 
   describe('checkCommentAvailabilityInThread function', () => {

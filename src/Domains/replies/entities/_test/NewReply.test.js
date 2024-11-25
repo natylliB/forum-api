@@ -50,6 +50,19 @@ describe('Reply object { comment_id, content, owner, date }', () => {
     expect(() => new NewReply(payload)).toThrowError('NEW_REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
   });
 
+  it('should throw error when reply content is empty', () => {
+    // Arrange
+    const payload = {
+      comment_id: 'comment-123',
+      content: '',
+      owner: 'user-123',
+      date: new Date().toISOString(),
+    };
+
+    // Action & Assert
+    expect(() => new NewReply(payload)).toThrowError('NEW_REPLY.CONTENT_CAN_NOT_BE_EMPTY');
+  });
+
   it('should create Reply object correctly', () => {
     // Arrange
     const payload = {

@@ -19,10 +19,14 @@ describe('DomainErrorTranslator', () => {
       .toStrictEqual(new InvariantError('tidak dapat menambahkan komentar karena properti yang dibutuhkan tidak ada'));
     expect(DomainErrorTranslator.translate(new Error('NEW_COMMENT.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('tidak dapat menambahkan komentar karena tipe data tidak sesuai'));
-    expect(DomainErrorTranslator.translate(new Error('NEW_REPLY.CONTENT_UNDEFINED')))
+    expect(DomainErrorTranslator.translate(new Error('NEW_COMMENT.CONTENT_CAN_NOT_BE_EMPTY')))
+      .toStrictEqual(new InvariantError('tidak dapat menambahkan komentar, komentar tidak boleh kosong'));
+      expect(DomainErrorTranslator.translate(new Error('NEW_REPLY.CONTENT_UNDEFINED')))
       .toStrictEqual(new InvariantError('tidak dapat menambahkan balasan karena properti yang dibutuhkan tidak ada'));
     expect(DomainErrorTranslator.translate(new Error('NEW_REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION')))
       .toStrictEqual(new InvariantError('tidak dapat menambahkan balasan karena tipe data tidak sesuai'));
+    expect(DomainErrorTranslator.translate(new Error('NEW_REPLY.CONTENT_CAN_NOT_BE_EMPTY')))
+      .toStrictEqual(new InvariantError('Balasan komentar tidak boleh kosong'));
   });
 
   it('should return original error when error message is not needed to translate', () => {

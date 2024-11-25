@@ -20,6 +20,10 @@ class NewReply {
       throw new Error('NEW_REPLY.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
     }
 
+    if (content.length === 0) {
+      throw new Error('NEW_REPLY.CONTENT_CAN_NOT_BE_EMPTY');
+    }
+
     if (requiredProperties.some(property => typeof property === 'undefined')) {
       throw new Error('NEW_REPLY.NOT_CONTAIN_REQUIRED_PROPERTY');
     }

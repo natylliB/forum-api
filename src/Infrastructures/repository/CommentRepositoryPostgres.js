@@ -11,21 +11,13 @@ class CommentRepositoryPostgres extends CommentRepository {
     this._pool = pool;
     this._idGenerator = idGenerator;
 
-    this._verifyComment = this._verifyComment.bind(this);
     this.addComment = this.addComment.bind(this);
     this.checkCommentAvailabilityInThread = this.checkCommentAvailabilityInThread.bind(this);
     this.checkCommentOwnership = this.checkCommentOwnership.bind(this);
     this.deleteComment = this.deleteComment.bind(this);
   }
 
-  _verifyComment(comment) {
-    if (comment.length === 0) {
-      throw new InvariantError('tidak dapat menambahkan komentar, komentar tidak boleh kosong');
-    }
-  }
-
   async addComment({ thread_id, content, owner, date }) {
-    this._verifyComment(content);
     const id = `comment-${this._idGenerator()}`;
     const query = {
       text: 'INSERT INTO comments VALUES($1, $2, $3, $4, $5, $6) RETURNING id, content, owner',

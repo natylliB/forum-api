@@ -50,6 +50,19 @@ describe('NewComment{ thread_id, content, owner, date } object', () => {
     expect(() => new NewComment(payload)).toThrowError('NEW_COMMENT.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
   });
 
+  it('should throw error when property content is empty', () => {
+    // Arrange
+    const payload = {
+      thread_id: 'thread-123',
+      content: '',
+      owner: 'user-123',
+      date: new Date().toISOString(),
+    };
+
+    // Action & Assert
+    expect(() => new NewComment(payload)).toThrowError('NEW_COMMENT.CONTENT_CAN_NOT_BE_EMPTY');
+  })
+
   it('should create NewComment object correctly', () => {
     const payload = {
       thread_id: 'tread-123',

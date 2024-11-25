@@ -10,7 +10,6 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     this._pool = pool;
     this._idGenerator = idGenerator;
 
-    this._verifiyReply = this._verifiyReply.bind(this);
     this.addReply = this.addReply.bind(this);
     this.checkReplyAvailabilityInComment = this.checkReplyAvailabilityInComment.bind(this);
     this.checkReplyOwnership = this.checkReplyOwnership.bind(this);
@@ -18,15 +17,7 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     this.getRepliesByCommentIds = this.getRepliesByCommentIds.bind(this);
   }
 
-  _verifiyReply(reply) {
-    if (reply.length === 0) {
-      throw new InvariantError('Balasan komentar tidak boleh kosong');
-    }
-  }
-
   async addReply({ comment_id, content, date, owner }){
-    this._verifiyReply(content);
-
     const id = `reply-${this._idGenerator()}`;
     const query = {
       text: 'INSERT INTO replies VALUES($1, $2, $3, $4, $5) returning id, content, owner',

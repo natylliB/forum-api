@@ -12,12 +12,17 @@ class NewComment {
 
   _validatePayload({ thread_id, content, owner, date }) {
     const requiredProperty = [ thread_id, content, owner, date ];
+
     if (typeof content === 'undefined') {
       throw new Error('NEW_COMMENT.CONTENT_UNDEFINED');
     }
 
     if (typeof content !== 'string') {
       throw new Error('NEW_COMMENT.CONTENT_NOT_MET_DATA_TYPE_SPECIFICATION');
+    }
+    
+    if (content.length === 0) {
+      throw new Error('NEW_COMMENT.CONTENT_CAN_NOT_BE_EMPTY');
     }
 
     if (requiredProperty.some(prop => typeof prop === 'undefined')) {
