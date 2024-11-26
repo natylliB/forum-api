@@ -64,6 +64,42 @@ describe('Thread { id, title, body, date, username } object', () => {
   });
 
   describe('setComments() function', () => {
+    it('should update comments correctly', () => {
+      const payload = {
+        id: 'thread-123',
+        title: 'An interesting topic',
+        body: 'An engaging content',
+        date: new Date(),
+        username: 'billy',
+      };
+
+      const thread = new Thread(payload);
+      expect(thread.comments).toHaveLength(0);
+
+      /** mock Comment Class */
+      Comment.mockImplementation(function Comment(payload) {
+        this.id = payload.id;
+      });
+
+      const comments = [
+        new Comment({
+          id: 'comment-123',
+        }),
+        new Comment({
+          id: 'comment-124',
+        }),
+        new Comment({
+          id: 'comment-125',
+        }),
+      ];
+
+      // Action
+      thread.setComments(comments);
+
+      // Assert
+      expect(thread.comments).toHaveLength(3);
+    });
+
     it('should throw error when not setting comments with array of comment', () => {
       // Arrange
       const payload = {
@@ -106,6 +142,9 @@ describe('Thread { id, title, body, date, username } object', () => {
         new Comment({
           date: '2021-08-08T07:22:33.555Z', // order 1
         }),
+        new Comment({
+          date: '2024-11-26T01:56:51.310Z', // order 3
+        }),
       ]
 
       // Action
@@ -119,6 +158,9 @@ describe('Thread { id, title, body, date, username } object', () => {
           },
           {
             date: '2021-08-08T07:26:21.338Z',
+          },
+          {
+            date: '2024-11-26T01:56:51.310Z',
           },
         ],
       )

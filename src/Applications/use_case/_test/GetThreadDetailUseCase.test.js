@@ -84,7 +84,7 @@ describe('GetThreadDetailUseCase', () => {
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith('thread-123');
     expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith('comment-123', 'comment-124');
 
-    expect(JSON.stringify(threadDetail, null, 2)).toEqual(JSON.stringify({
+    expect(threadDetail).toEqual({
       id: 'thread-123',
       title: 'sebuah thread',
       body: 'sebuah body thread',
@@ -125,7 +125,7 @@ describe('GetThreadDetailUseCase', () => {
           content: '**komentar telah dihapus**',
         },
       ],
-    }, null, 2));
+    });
   });
 
   it('should orchestrate getting thread detail correctly for thread without comment', async () => {
