@@ -35,6 +35,7 @@ const DeleteCommentUseCase = require('../Applications/use_case/DeleteCommentUseC
 const GetThreadDetailUseCase = require('../Applications/use_case/GetThreadDetailUseCase');
 const AddReplyUseCase = require('../Applications/use_case/AddReplyUseCase');
 const DeleteReplyUseCase = require('../Applications/use_case/DeleteReplyUseCase');
+const GreetingUseCase = require('../Applications/use_case/GreetingUseCase');
 
 // creating container
 const container = createContainer();
@@ -315,6 +316,10 @@ container.register([
         },
       ],
     },
+  },
+  {
+    key: GreetingUseCase.name,
+    Class: GreetingUseCase,
   },
 ]);
 

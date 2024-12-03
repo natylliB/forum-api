@@ -6,3 +6,4 @@ coverage
 .env
 forumapi-submission-1-expert-backend.zip
 forum-api-webserver.pem
+.vscode

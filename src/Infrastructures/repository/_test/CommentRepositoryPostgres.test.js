@@ -6,7 +6,6 @@ const ThreadTableTestHelper = require('../../../../tests/ThreadsTableTestHelper'
 const NewComment = require('../../../Domains/comments/entities/NewComment');
 const AddedComment = require('../../../Domains/comments/entities/AddedComment');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
-const InvariantError = require('../../../Commons/exceptions/InvariantError');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('CommentRepositoryPostgres', () => {

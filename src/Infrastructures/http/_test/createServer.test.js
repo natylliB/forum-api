@@ -1,4 +1,5 @@
 const createServer = require('../createServer');
+const container = require('../../container');
 
 describe('HTTP server', () => {
   it('should response 404 when request unregistered route', async () => {
@@ -52,5 +53,23 @@ describe('HTTP server', () => {
     const responseJson = JSON.parse(response.payload);
     expect(response.statusCode).toEqual(401);
     expect(responseJson.message).toBeDefined();
+  });
+
+  describe('when GET /', () => {
+    it('should response 200 with Hello World!', async () => {
+      // Arrange
+      const server = await createServer(container);
+
+      // Action
+      const response = await server.inject({
+        method: 'GET',
+        url: '/',
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.value).toEqual('Hello World!');
+    })
   })
 });

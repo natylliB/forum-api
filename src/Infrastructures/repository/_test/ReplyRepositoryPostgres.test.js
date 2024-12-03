@@ -8,7 +8,6 @@ const NewReply = require('../../../Domains/replies/entities/NewReply');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
-const InvariantError = require('../../../Commons/exceptions/InvariantError');
 
 describe('ReplyRepositoryPostgres', () => {
   beforeAll(async () => {
