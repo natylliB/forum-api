@@ -20,15 +20,6 @@ jobs:
         script: |
           cd ~/forum-api
           git pull origin master
-          if ! command -v npm &> /dev/null; then
-            echo "Node.js is not installed. Installing Node.js..."
-            curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-          fi
           npm install   
           npm run migrate up
-          if ! command -v pm2 &> /dev/null; then
-            echo "PM2 is not installed. Installing PM2..."
-            sudo npm install -g pm2
-          fi
           pm2 restart forum-api
