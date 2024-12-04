@@ -166,13 +166,13 @@ describe('GetThreadDetailUseCase', () => {
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith('thread-123');
     expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith();
 
-    expect(JSON.stringify(threadDetail, null, 2)).toEqual(JSON.stringify({
+    expect(threadDetail).toEqual({
       id: 'thread-123',
       title: 'sebuah thread',
       body: 'sebuah body thread',
       date: '2021-08-08T07:19:09.775Z',
       username: 'billy',
       comments: [],
-    }, null, 2));
+    });
   })
 });
