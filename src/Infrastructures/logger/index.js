@@ -3,6 +3,8 @@
 const winston = require('winston');
 const WinstonCloudWatch = require('winston-cloudwatch');
 
+const isTestEnv = process.env.NODE_ENV === 'test';
+
 const cloudWatchConfig = {
   logGroupName: 'Forum-Api-Log-Group',
   logStreamName: 'Forum-Api-Log-Stream',
@@ -12,6 +14,12 @@ const cloudWatchConfig = {
   messageFormatter: ({ level, message }) => `[${ level }] : ${message}`,
 };
 
-winston.add(new WinstonCloudWatch(cloudWatchConfig));
+if(!isTestEnv) {
+  winston.add(new WinstonCloudWatch(cloudWatchConfig));
+} else {
+  winston.add(new winston.transports.Console({ 
+    format: winston.format.simple(),
+  }));
+}
 
 module.exports = winston;
