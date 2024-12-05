@@ -1,4 +1,4 @@
-/* istanbul ignore files */
+/* istanbul ignore file */
 
 const winston = require('winston');
 const WinstonCloudWatch = require('winston-cloudwatch');
