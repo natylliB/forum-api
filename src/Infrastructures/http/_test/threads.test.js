@@ -62,9 +62,6 @@ describe('/threads endpoint', () => {
     expect(userRows).toHaveLength(0);
     expect(threadRows).toHaveLength(0);
 
-    billyAccessToken = '';
-    billyRefreshToken = '';
-
     // close client
     await pool.end();
   });
@@ -233,6 +230,33 @@ describe('/threads endpoint', () => {
 
       const jackCommentTimeStamp = await CommentTableTestHelper.getCommentTimestamp(jackCommentId);
 
+      /** billy like jack's comment */
+      await server.inject({
+        method: 'PUT',
+        url: `/threads/${billyThreadId}/comments/${jackCommentId}/likes`,
+        headers: {
+          authorization: `Bearer ${billyAccessToken}`,
+        },
+      });
+
+      /** jack like jack's comment */
+      await server.inject({
+        method: 'PUT',
+        url: `/threads/${billyThreadId}/comments/${jackCommentId}/likes`,
+        headers: {
+          authorization: `Bearer ${jackAccessToken}`,
+        },
+      });
+
+      /** jack unlike jack's comment */
+      await server.inject({
+        method: 'PUT',
+        url: `/threads/${billyThreadId}/comments/${jackCommentId}/likes`,
+        headers: {
+          authorization: `Bearer ${jackAccessToken}`,
+        },
+      });
+
       /** billy comment on billy thread */
       const responseBillyComment = await server.inject({
         method: 'POST',
@@ -343,6 +367,7 @@ describe('/threads endpoint', () => {
               }
             ],
             content: 'Sangat menarik!!',
+            likeCount: 1,
           },
           {
             id: billyCommentId,
@@ -350,6 +375,7 @@ describe('/threads endpoint', () => {
             date: billyCommentTimestamp,
             replies: [],
             content: '**komentar telah dihapus**',
+            likeCount: 0,
           },
         ],
       }));
