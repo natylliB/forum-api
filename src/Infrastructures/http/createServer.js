@@ -9,6 +9,8 @@ const comments = require('../../Interfaces/http/api/comments');
 const replies = require('../../Interfaces/http/api/replies');
 const greetings = require('../../Interfaces/http/api/greetings');
 const commentLikes = require('../../Interfaces/http/api/commentLikes');
+const logger = require('../logger/index');
+const os = require('os');
 
 const createServer = async (container) => {
   const server = Hapi.server({
@@ -90,7 +92,7 @@ const createServer = async (container) => {
       }
 
       // penanganan server error sesuai kebutuhan
-      console.log(translatedError.stack);
+      logger.log('error', `userIP=${request.info.remoteAddress}, host=${os.hostname}, method=${request.method}, path=${request.path}, error=${translatedError.stack}`);
       const newResponse = h.response({
         status: 'error',
         message: 'terjadi kegagalan pada server kami',

@@ -28,6 +28,8 @@ describe('CommentLikeRepositoryPostgres', () => {
     await CommentTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
+
+    await pool.end();
   })
 
   describe('addCommentLike function', () => {
