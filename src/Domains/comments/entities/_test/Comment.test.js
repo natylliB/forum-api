@@ -69,7 +69,7 @@ describe('Comment { id, content, username, date, is_delete } object', () => {
     };
 
     // Action
-    const { id, username, date, replies, content } = new Comment(payload);
+    const { id, username, date, replies, content, likeCount } = new Comment(payload);
 
     // Assert
     expect(id).toEqual(payload.id);
@@ -77,6 +77,7 @@ describe('Comment { id, content, username, date, is_delete } object', () => {
     expect(date).toEqual(payload.date.toISOString());
     expect(replies).toEqual([]);
     expect(content).toEqual(payload.content);
+    expect(likeCount).toEqual(0);
   });
 
   describe('setReplies() function', () => {
@@ -189,6 +190,42 @@ describe('Comment { id, content, username, date, is_delete } object', () => {
           date: '2024-11-24T04:41:33.711Z',
         },
       ]);
+    });
+  });
+
+  describe('setLikeCount function', () => {
+    it('should set likeCount correctly', () => {
+      // Arrange
+      const payload = {
+        id: 'comment-123',
+        content: 'A Comment',
+        username: 'billy',
+        date: new Date(),
+        is_delete: false,
+      };
+
+      const comment = new Comment(payload);
+      expect(comment.likeCount).toEqual(0);
+
+      // Action
+      comment.setLikeCount(2);
+
+      // Assert
+      expect(comment.likeCount).toEqual(2);
+    });
+
+    it('should throw error when setting likeCount with non number', () => {
+      // Arrange
+      const payload = {
+        id: 'comment-123',
+        content: 'A Comment',
+        username: 'billy',
+        date: new Date(),
+        is_delete: false,
+      };
+
+      const comment = new Comment(payload);
+      expect(() => comment.setLikeCount('2')).toThrowError('COMMENT.LIKE_COUNT_MUST_BE_A_NUMBER');
     });
   });
 });

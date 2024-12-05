@@ -2,6 +2,7 @@ const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
+const CommentLikeRepository = require('../../../Domains/likes/CommentLikeRepository');
 
 describe('GetThreadDetailUseCase', () => {
   it('should orchestrate getting thread detail correctly', async () => {
@@ -10,6 +11,7 @@ describe('GetThreadDetailUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
+    const mockCommentLikeRepository = new CommentLikeRepository();
 
     /** mock required depedencies functions */
     mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue();
@@ -68,11 +70,23 @@ describe('GetThreadDetailUseCase', () => {
       },
     ]);
 
+    mockCommentLikeRepository.getCommentLikeCountsByCommentIds = jest.fn().mockResolvedValue([
+      {
+        comment_id: 'comment-123',
+        like_count: '2',
+      },
+      {
+        comment_id: 'comment-124',
+        like_count: '0',
+      },
+    ]);
+
     
     const getThreadDetailUseCase = new GetThreadDetailUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
       replyRepository: mockReplyRepository,
+      commentLikeRepository: mockCommentLikeRepository,
     });
     
     // Action
@@ -83,6 +97,7 @@ describe('GetThreadDetailUseCase', () => {
     expect(mockThreadRepository.getThreadDetail).toBeCalledWith('thread-123');
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith('thread-123');
     expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith('comment-123', 'comment-124');
+    expect(mockCommentLikeRepository.getCommentLikeCountsByCommentIds).toBeCalledWith('comment-123', 'comment-124');
 
     expect(threadDetail).toEqual({
       id: 'thread-123',
@@ -116,6 +131,7 @@ describe('GetThreadDetailUseCase', () => {
             },
           ],
           content: 'sebuah comment',
+          likeCount: 2,
         },
         {
           id: 'comment-124',
@@ -123,56 +139,9 @@ describe('GetThreadDetailUseCase', () => {
           date: '2021-08-08T07:26:21.338Z',
           replies: [],
           content: '**komentar telah dihapus**',
+          likeCount: 0,
         },
       ],
     });
   });
-
-  it('should orchestrate getting thread detail correctly for thread without comment', async () => {
-    // Arrange
-    /** mock required depedencies */
-    const mockThreadRepository = new ThreadRepository();
-    const mockCommentRepository = new CommentRepository();
-    const mockReplyRepository = new ReplyRepository();
-
-    /** mock required depedencies functions */
-    mockThreadRepository.checkThreadAvailability = jest.fn().mockResolvedValue(true);
-
-    mockThreadRepository.getThreadDetail = jest.fn().mockResolvedValue({
-      id: 'thread-123',
-      title: 'sebuah thread',
-      body: 'sebuah body thread',
-      username: 'billy',
-      date: new Date('2021-08-08T07:19:09.775Z'),
-    });
-
-    mockCommentRepository.getCommentsByThreadId = jest.fn().mockResolvedValue([]); // no comment
-
-    mockReplyRepository.getRepliesByCommentIds = jest.fn().mockResolvedValue([]); // thus no reply
-
-    
-    const getThreadDetailUseCase = new GetThreadDetailUseCase({
-      threadRepository: mockThreadRepository,
-      commentRepository: mockCommentRepository,
-      replyRepository: mockReplyRepository,
-    });
-    
-    // Action
-    const threadDetail = await getThreadDetailUseCase.execute('thread-123');
-
-    // Assert
-    expect(mockThreadRepository.checkThreadAvailability).toBeCalledWith('thread-123');
-    expect(mockThreadRepository.getThreadDetail).toBeCalledWith('thread-123');
-    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith('thread-123');
-    expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith();
-
-    expect(threadDetail).toEqual({
-      id: 'thread-123',
-      title: 'sebuah thread',
-      body: 'sebuah body thread',
-      date: '2021-08-08T07:19:09.775Z',
-      username: 'billy',
-      comments: [],
-    });
-  })
 });

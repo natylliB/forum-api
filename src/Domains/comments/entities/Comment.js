@@ -11,6 +11,7 @@ class Comment {
     this.date = date.toISOString();
     this.replies = [];
     this.content = is_delete ? '**komentar telah dihapus**' : content;
+    this.likeCount = 0;
   }
 
   setReplies(val) {
@@ -19,6 +20,14 @@ class Comment {
     }
 
     this.replies = val.sort((a, b) => (a.date > b.date ? 1 : -1));
+  }
+
+  setLikeCount(val) {
+    if (typeof val !== 'number') {
+      throw new Error('COMMENT.LIKE_COUNT_MUST_BE_A_NUMBER');
+    }
+
+    this.likeCount = val;
   }
 
   _validatePayload({ id, content, username, date, is_delete }){

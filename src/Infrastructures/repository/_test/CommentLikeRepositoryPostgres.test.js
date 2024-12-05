@@ -107,4 +107,46 @@ describe('CommentLikeRepositoryPostgres', () => {
       expect(isCommentLiked).toEqual(false);
     });
   });
+
+  describe('getCommentLikeCountsByCommentIds', () => {
+    beforeAll(async () => {
+      // billy comment on billy's thread
+      await CommentTableTestHelper.addComment({ id: 'comment-124', thread_id: 'thread-123', owner: 'user-123' });
+    });
+
+    it('should return array of comment likes', async () => {
+      // Arrange
+      // billy like jack's comment
+      await CommentLikesTableTestHelper.addCommentLike({ id: 'comment_like-123', comment_id: 'comment-123', owner: 'user-123' });
+
+      const commentLikeRepositoryPostgres = new CommentLikeRepositoryPostgres(pool, {});
+
+      const arrayOfCommentIds = [ 'comment-123', 'comment-124' ];
+
+      // Action
+      const likeCountOfComments = await commentLikeRepositoryPostgres.getCommentLikeCountsByCommentIds(...arrayOfCommentIds);
+
+      // Assert
+      expect(likeCountOfComments).toHaveLength(1);
+      expect(likeCountOfComments).toEqual([
+        {
+          comment_id: 'comment-123',
+          like_count: "1",
+        },
+      ]);
+    });
+
+    it('should return empty array when there is no commentids', async () => {
+      // Arrange
+      const commentLikeRepositoryPostgres = new CommentLikeRepositoryPostgres(pool, {});
+      const arrayOfCommentIds = []
+
+      // Action
+      const likeCountOfComments = await commentLikeRepositoryPostgres.getCommentLikeCountsByCommentIds(...arrayOfCommentIds);
+
+      // Assert
+      expect(likeCountOfComments).toHaveLength(0);
+      expect(likeCountOfComments).toEqual([]);
+    })
+  });
 });

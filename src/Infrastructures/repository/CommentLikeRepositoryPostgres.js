@@ -42,6 +42,32 @@ class CommentLikeRepositoryPostgres extends CommentLikeRepository {
 
     return result.rows[0].exists;
   }
+
+  async getCommentLikeCountsByCommentIds(...commentIds) {
+    if (commentIds.length === 0) {
+      return [];
+    }
+
+    const placeholder = commentIds.map((_, index) => `$${index + 1}`).join(', ');
+
+    const query = {
+      text: `
+        SELECT
+          cl.comment_id,
+          COUNT(cl.id) AS like_count
+        FROM
+          comment_likes cl
+        WHERE 
+          cl.comment_id IN (${placeholder})
+        GROUP BY
+          cl.comment_id
+      `,
+      values: commentIds,
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows;
+  }
 }
 
 module.exports = CommentLikeRepositoryPostgres;

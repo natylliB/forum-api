@@ -23,5 +23,11 @@ describe('CommentLikeRepository Interface', () => {
     ).rejects.toThrowError(
       'COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED'
     );
+
+    await expect(
+      commentLikeRepository.getCommentLikeCountsByCommentIds('')
+    ).rejects.toThrowError(
+      'COMMENT_LIKE_REPOSITORY.METHOD_NOT_IMPLEMENTED'
+    );
   })
 })
